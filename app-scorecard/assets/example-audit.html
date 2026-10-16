@@ -1,0 +1,351 @@
+<title>QuoteFinder Framework Audit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300..800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F2F4F0; --paper-2:#E8ECE6; --ink:#17201F; --ink-2:#48524F; --ink-3:#7A847F;
+  --rule:#CBD3CC; --accent:#0E6B66; --accent-soft:#D6E8E4;
+  --bad:#A8372B; --bad-soft:#F1DDD8; --warn:#B07A14; --warn-soft:#F3E7CC; --ok:#3B7A4B; --ok-soft:#DCEAD9;
+  --off:#D2D9D3;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#151B1A; --paper-2:#1D2524; --ink:#E9EEEB; --ink-2:#B4BDB8; --ink-3:#7E8985;
+    --rule:#2E3937; --accent:#5FC1B7; --accent-soft:#183634;
+    --bad:#E07B6E; --bad-soft:#3A2220; --warn:#E0B255; --warn-soft:#3A2F17; --ok:#7FC38F; --ok-soft:#1E3524;
+    --off:#2C3634;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#151B1A; --paper-2:#1D2524; --ink:#E9EEEB; --ink-2:#B4BDB8; --ink-3:#7E8985;
+  --rule:#2E3937; --accent:#5FC1B7; --accent-soft:#183634;
+  --bad:#E07B6E; --bad-soft:#3A2220; --warn:#E0B255; --warn-soft:#3A2F17; --ok:#7FC38F; --ok-soft:#1E3524;
+  --off:#2C3634;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:48px 24px 96px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+h1{font-size:clamp(36px,5vw,56px);line-height:1.02;font-weight:700;letter-spacing:-.02em;margin:10px 0 18px;text-wrap:balance;font-variation-settings:"opsz" 96}
+h2{font-size:26px;line-height:1.15;font-weight:600;letter-spacing:-.015em;margin:0 0 6px;text-wrap:balance}
+h3{font-size:17px;font-weight:600;margin:0}
+p{max-width:66ch;margin:0}
+.lede{font-size:19px;color:var(--ink-2);max-width:62ch}
+code{font-family:"IBM Plex Mono",monospace;font-size:12.5px;background:var(--paper-2);padding:1px 5px;border-radius:3px;color:var(--ink)}
+section{margin-top:64px;padding-top:28px;border-top:1px solid var(--rule)}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;margin-bottom:24px}
+.sec-head p{color:var(--ink-2)}
+
+.head{display:grid;grid-template-columns:1fr auto;gap:32px;align-items:start}
+.verdict{display:flex;flex-direction:column;align-items:flex-end;gap:6px;text-align:right}
+.verdict .chip{font-size:22px;font-weight:700;letter-spacing:.02em;padding:10px 18px;border-radius:4px;background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
+.verdict small{color:var(--ink-3);font-size:13px}
+.method{margin-top:32px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.method div{padding:14px 16px;border:1px solid var(--rule);border-radius:6px;font-size:14px;color:var(--ink-2)}
+.method b{display:block;color:var(--ink);font-size:13px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+
+/* overview strip */
+.overview{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.ov{padding:12px 12px 10px;border-radius:4px;background:var(--paper-2);border:1px solid var(--rule);display:flex;flex-direction:column;gap:6px}
+.ov .n{font-size:13px;font-weight:600;line-height:1.2}
+.ov .s{font-size:26px;font-weight:500;line-height:1}
+.ov .bar{height:4px;background:var(--off);border-radius:2px;overflow:hidden}
+.ov .bar i{display:block;height:100%}
+.ov.s5 .bar i,.ov.s4 .bar i,.ov.s3 .bar i{background:var(--accent)}
+.ov.s2 .bar i{background:var(--warn)}
+.ov.s1 .bar i,.ov.s0 .bar i{background:var(--bad)}
+.ov.su .s{color:var(--ink-3);font-size:18px;padding-top:6px}
+.ov.gate{border-color:var(--bad)}
+.ov .g{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--bad);font-weight:700}
+
+/* blockers */
+.blocks{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
+.block{border-left:4px solid var(--bad);background:var(--bad-soft);padding:16px 18px;border-radius:0 6px 6px 0}
+.block .tag{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--bad);font-weight:700}
+.block h3{margin-top:6px;font-size:18px}
+.block p{font-size:14px;color:var(--ink-2);margin-top:8px;max-width:none}
+
+/* dimension cards */
+.dim{display:grid;grid-template-columns:230px 1fr;gap:24px;padding:22px 0;border-bottom:1px solid var(--rule)}
+.dim .left{display:flex;flex-direction:column;gap:8px}
+.dim .name{font-size:18px;font-weight:600;line-height:1.2}
+.dim .score{display:flex;align-items:center;gap:10px}
+.dim .score .num{font-size:34px;font-weight:500;line-height:1}
+.dim .score .of{font-size:13px;color:var(--ink-3)}
+.dim .ev{font-size:11px;font-weight:700;letter-spacing:.06em;padding:2px 7px;border-radius:3px;border:1px solid var(--rule);background:var(--paper-2);color:var(--ink-2);align-self:flex-start}
+.dim.s3 .num,.dim.s4 .num,.dim.s5 .num{color:var(--accent)} .dim.s2 .num{color:var(--warn)} .dim.s1 .num,.dim.s0 .num{color:var(--bad)} .dim.su .num{color:var(--ink-3);font-size:22px}
+.dim .right{display:flex;flex-direction:column;gap:10px}
+.dim .sum{font-size:15px;color:var(--ink);line-height:1.45;max-width:none}
+.checks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:6px 24px}
+.checks li{font-size:13.5px;color:var(--ink-2);line-height:1.4;display:grid;grid-template-columns:18px 1fr;gap:8px;align-items:start}
+.checks li::before{content:"";width:12px;height:12px;border-radius:2px;margin-top:4px;border:1.5px solid var(--ink-3)}
+.checks li.y::before{background:var(--ok);border-color:var(--ok)}
+.checks li.n::before{background:var(--bad);border-color:var(--bad)}
+.checks li.p::before{background:linear-gradient(90deg,var(--warn) 50%,transparent 50%);border-color:var(--warn)}
+.checks li.u::before{border-style:dashed}
+.fix{font-size:13.5px;color:var(--accent);font-weight:600}
+.fix::before{content:"Smallest fix · ";color:var(--ink-3);font-weight:600}
+.legend{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);margin:0 0 8px}
+.legend span{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:2px;display:inline-block;border:1.5px solid var(--ink-3)}
+.legend i.y{background:var(--ok);border-color:var(--ok)} .legend i.n{background:var(--bad);border-color:var(--bad)} .legend i.p{background:linear-gradient(90deg,var(--warn) 50%,transparent 50%);border-color:var(--warn)} .legend i.u{border-style:dashed}
+.grp{margin-top:36px}
+.grp .gt{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding-bottom:8px;border-bottom:2px solid var(--ink)}
+
+/* judgment */
+.judge{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.judge .c{border:1px solid var(--rule);border-radius:6px;padding:18px 20px}
+.judge .c h3{font-size:14px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:10px}
+.judge ol,.judge ul{margin:0;padding-left:18px;font-size:14.5px;line-height:1.45;color:var(--ink)}
+.judge li+li{margin-top:6px}
+.next{margin-top:16px;background:var(--ink);color:var(--paper);border-radius:6px;padding:26px 30px;display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.next h2,.next .eyebrow{color:var(--paper)} .next .eyebrow{opacity:.6}
+.next p,.next li{color:var(--paper);opacity:.9;font-size:15px}
+.next ol{margin:8px 0 0;padding-left:20px}
+.foot{margin-top:40px;font-size:13px;color:var(--ink-3);max-width:none}
+
+@media (max-width:860px){
+  .head{grid-template-columns:1fr}.verdict{align-items:flex-start;text-align:left}
+  .method,.blocks,.judge,.next{grid-template-columns:1fr}
+  .dim{grid-template-columns:1fr;gap:12px}.dim .left{flex-direction:row;align-items:center;gap:16px;flex-wrap:wrap}
+  .checks{grid-template-columns:1fr}
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="head">
+      <div>
+        <div class="eyebrow">Code and deployment audit · no tester input · Sep 5, 2026</div>
+        <h1>QuoteFinder Framework Audit</h1>
+        <p class="lede">The app scored on all 23 dimensions of the "What Makes an App Exceptional" framework, from the repository, the pipeline, and the deploy scripts alone. Where the framework forbids inferring something from code, the score reads <b>unknown</b> instead of a guess.</p>
+      </div>
+      <div class="verdict">
+        <span class="eyebrow">Verdict</span>
+        <span class="chip">Iterate</span>
+        <small>Strong build discipline for a solo project.</small>
+        <small>Three noncompensatory blockers open.</small>
+      </div>
+    </div>
+    <div class="method">
+      <div><b>What was read</b>~17,500 lines across app, lib, components. 39 API routes. Pipeline segmenters. Deploy scripts, CI, service unit, README, AGENTS.md, PREMIUM.md.</div>
+      <div><b>What was run</b>Test suite (50 pass, 0 fail). ESLint (fails to start, config migration pending). Grep sweeps for gating, quotas, accessibility, i18n, error handling, telemetry.</div>
+      <div><b>What was refused</b>Retention, market fit, satisfaction, revenue. The framework says never infer these from UI or source. They stay unknown until instrumented.</div>
+    </div>
+  </header>
+
+  <section>
+    <div class="sec-head">
+      <div><div class="eyebrow">At a glance</div><h2>Twenty-three dimensions</h2></div>
+      <p>Not averaged. Gates listed first, then the scorecard.</p>
+    </div>
+    <div class="overview">
+      <div class="ov s3"><span class="n">Product strategy</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s4"><span class="n">Value proposition</span><span class="s mono">4</span><span class="bar"><i style="width:80%"></i></span></div>
+      <div class="ov su"><span class="n">Market fit</span><span class="s mono">unknown</span><span class="bar"></span></div>
+      <div class="ov s2"><span class="n">User research</span><span class="s mono">2</span><span class="bar"><i style="width:40%"></i></span></div>
+      <div class="ov s2"><span class="n">Onboarding</span><span class="s mono">2</span><span class="bar"><i style="width:40%"></i></span></div>
+      <div class="ov su"><span class="n">Retention</span><span class="s mono">unknown</span><span class="bar"></span></div>
+      <div class="ov su"><span class="n">Engagement</span><span class="s mono">unknown</span><span class="bar"></span></div>
+      <div class="ov s3"><span class="n">Core UX</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s3"><span class="n">Interaction design</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s2 gate"><span class="g">gate</span><span class="n">Accessibility</span><span class="s mono">2</span><span class="bar"><i style="width:40%"></i></span></div>
+      <div class="ov s3"><span class="n">Performance</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s2"><span class="n">Reliability</span><span class="s mono">2</span><span class="bar"><i style="width:40%"></i></span></div>
+      <div class="ov s3"><span class="n">Security / privacy</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s1 gate"><span class="g">gate</span><span class="n">Analytics / KPIs</span><span class="s mono">1</span><span class="bar"><i style="width:20%"></i></span></div>
+      <div class="ov s3"><span class="n">Experimentation</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s1"><span class="n">Growth / virality</span><span class="s mono">1</span><span class="bar"><i style="width:20%"></i></span></div>
+      <div class="ov s3"><span class="n">Monetization</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s2"><span class="n">Pricing</span><span class="s mono">2</span><span class="bar"><i style="width:40%"></i></span></div>
+      <div class="ov s3"><span class="n">Engineering</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+      <div class="ov s2"><span class="n">Scalability</span><span class="s mono">2</span><span class="bar"><i style="width:40%"></i></span></div>
+      <div class="ov s2"><span class="n">Localization</span><span class="s mono">2</span><span class="bar"><i style="width:40%"></i></span></div>
+      <div class="ov s1 gate"><span class="g">gate</span><span class="n">Legal / compliance</span><span class="s mono">1</span><span class="bar"><i style="width:20%"></i></span></div>
+      <div class="ov s3"><span class="n">Design system</span><span class="s mono">3</span><span class="bar"><i style="width:60%"></i></span></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div><div class="eyebrow">Noncompensatory blockers</div><h2>Three gates, all fixable in days</h2></div>
+      <p>The framework treats security, privacy, accessibility and compliance as gates. A high score elsewhere cannot offset these.</p>
+    </div>
+    <div class="blocks">
+      <div class="block">
+        <div class="tag">Legal · privacy</div>
+        <h3>No privacy policy, terms, or account deletion</h3>
+        <p>Google sign-in collects email and name. Per-email search queries, AI usage, and reflections are written to the store. No route under <code>app/</code> names privacy or terms. No way for a user to delete their account or data. Stripe billing runs without posted terms.</p>
+      </div>
+      <div class="block">
+        <div class="tag">Analytics · measurement</div>
+        <h3>Value telemetry is a no-op</h3>
+        <p><code>@vercel/analytics</code> is mounted in the layout, but the app runs on a VPS under systemd, not Vercel. It sends nothing. The store logs searches, not outcomes. Activation, retention, and task success cannot be computed by anyone.</p>
+      </div>
+      <div class="block">
+        <div class="tag">Accessibility · audience</div>
+        <h3>No accessibility pass on a product for an older audience</h3>
+        <p>Zero <code>prefers-reduced-motion</code> rules despite intro and explainer animations. Focus styles on 21 sites across ~60 components. Five images, five alt attributes, so images are fine. No keyboard or screen-reader test recorded anywhere. Sepia contrast already needed one fix.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div><div class="eyebrow">Scorecard</div><h2>Dimension by dimension</h2></div>
+      <div class="legend"><span><i class="y"></i> present</span><span><i class="p"></i> partial</span><span><i class="n"></i> missing</span><span><i class="u"></i> unknowable from code</span></div>
+    </div>
+
+    <div class="grp"><div class="gt">Strategy, research, growth, economics</div>
+
+      <div class="dim s3"><div class="left"><span class="name">Product strategy</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">The wedge is crisp in AGENTS.md: source-based quote finder for pastors in one region. But the route list tells a different story. Search, Ask, Today, Topics, Photos, Journeys, Circles, Bench, Deep Study, Bible cross-references, World Scripture, translation, TTS. Twelve surfaces shipped in weeks with no stated non-goals.</p>
+        <ul class="checks"><li class="y">Target user and job stated</li><li class="y">Differentiation is outcome-based (grounded vs invented)</li><li class="n">Non-goals written down</li><li class="n">Scale plans wait for validation</li></ul>
+        <p class="fix">Write three non-goals into AGENTS.md and freeze new surfaces until the value event is measured.</p></div></div>
+
+      <div class="dim s4"><div class="left"><span class="name">Value proposition</span><div class="score"><span class="num mono">4</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">19,638 citation-tagged quotes, full source documents for read-in-context, an attribution guard with tests, and AI that is told to cite or stay silent. Every feature maps to the job "find a quote I can stand behind." The framework's ideal: features connected to a high-priority job, with the social and emotional weight (a pastor's credibility) built in.</p>
+        <ul class="checks"><li class="y">Maps to a user job</li><li class="y">First-value event identifiable (cited quote used)</li><li class="p">First-value event defined in code</li><li class="y">Alternatives clearly worse at the job</li></ul>
+        <p class="fix">Name the value event in README so every feature is judged against it.</p></div></div>
+
+      <div class="dim su"><div class="left"><span class="name">Market fit</span><div class="score"><span class="num mono">unknown</span></div><span class="ev">Refused</span></div>
+        <div class="right"><p class="sum">The framework is explicit: product-market fit is a state of evidence, and it cannot be read from a codebase. There are no cohort files, no renewal records, no repeat-use metric. A pricing page and Stripe integration are not evidence of willingness to pay.</p>
+        <ul class="checks"><li class="u">Cohort retention</li><li class="u">Repeat choice</li><li class="u">Organic pull</li><li class="n">Any of the above instrumented</li></ul>
+        <p class="fix">See Analytics. Nothing here moves until that does.</p></div></div>
+
+      <div class="dim s2"><div class="left"><span class="name">User research</span><div class="score"><span class="num mono">2</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">A feedback form and a feature-request dialog exist, and Search Lab collects blind relevance judgments. That is research infrastructure. What is missing is any record that research changed a decision: no research notes, no task-success measurement, no observed sessions in the repo or docs.</p>
+        <ul class="checks"><li class="y">Feedback channels built</li><li class="y">Retrieval quality judged blind</li><li class="n">Task success measured</li><li class="n">Decisions traceable to research</li></ul>
+        <p class="fix">A `docs/research/` folder with one page per study and the decision it drove.</p></div></div>
+
+      <div class="dim s1"><div class="left"><span class="name">Analytics / KPIs</span><div class="score"><span class="num mono">1</span><span class="of">/ 5</span></div><span class="ev">Observed · gate</span></div>
+        <div class="right"><p class="sum">The store records searches, users, AI cost, quotas, and subscriptions. Admin renders counts. That is an operations log, not a measurement system. No North Star, no activation definition, no event taxonomy, no guardrails. The Vercel Analytics import is dead weight off-platform.</p>
+        <ul class="checks"><li class="n">North Star or value metric defined</li><li class="n">Activation defined as value, not sign-in</li><li class="y">AI cost tracked per model</li><li class="n">Client analytics actually shipping events</li><li class="n">Vanity metrics identified as such</li><li class="p">Data quality checks (store is append-only JSONL, unvalidated)</li></ul>
+        <p class="fix">Replace the Vercel import with self-hosted Umami or Plausible, and fire one event: quote copied / shared / benched.</p></div></div>
+
+      <div class="dim s3"><div class="left"><span class="name">Experimentation</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Search Lab is real: four retrieval strategies behind randomized A–D labels, method names revealed only after judgment, append-only trials, scoring tests, an export. Rare for a project this size. It covers one thing, retrieval ranking, and there is no framework for product experiments.</p>
+        <ul class="checks"><li class="y">Hypothesis before result (blind labels)</li><li class="y">Randomization correct</li><li class="n">Power or minimum detectable effect considered</li><li class="n">Guardrail metrics</li><li class="n">Any experiment outside retrieval</li></ul>
+        <p class="fix">Keep it. Add a guardrail column (citation completeness) to the judgment schema.</p></div></div>
+
+      <div class="dim s1"><div class="left"><span class="name">Growth / virality</span><div class="score"><span class="num mono">1</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">A share-quote button and an install banner. No loop: sharing a quote does not bring the receiver into the product with value, nothing invites, nothing compounds. The framework wants a loop coupled to the core job. Circles (shared study groups) is the closest candidate but has no invite mechanics.</p>
+        <ul class="checks"><li class="p">Share exists, receiver value unclear</li><li class="n">Growth loop diagrammed</li><li class="n">Invite-to-activation measured</li><li class="y">No dark patterns</li></ul>
+        <p class="fix">Shared quote links should land on a cited, readable quote page with one search box beneath it.</p></div></div>
+
+      <div class="dim s3"><div class="left"><span class="name">Monetization</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Stripe checkout, portal, and a signature-verified webhook as the source of truth for entitlements. Tier gating enforced server-side on Ask, Deep Study, TTS. Search stays free, so the core value event is not paywalled. Clean mechanics. What is unknown is whether anyone converts.</p>
+        <ul class="checks"><li class="y">Payer and user identified</li><li class="y">Webhook verified, entitlements server-side</li><li class="y">Core value not paywalled</li><li class="u">Conversion, churn, margin monitored</li></ul>
+        <p class="fix">Log AI cost per subscriber against subscription revenue in admin. One number.</p></div></div>
+
+      <div class="dim s2"><div class="left"><span class="name">Pricing</span><div class="score"><span class="num mono">2</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Basic and Premium tiers exist in code and a pricing preview sits on the home page. PREMIUM.md has drifted from what shipped. No willingness-to-pay study, no price test, and the unit (per person per month) may not match how churches actually buy software (per community, annually).</p>
+        <ul class="checks"><li class="y">Price unit understandable</li><li class="p">Tier packaging matches code</li><li class="n">Willingness-to-pay evidence</li><li class="n">Buyer model tested (pastor vs community)</li></ul>
+        <p class="fix">Reconcile PREMIUM.md with the code, then run five pricing conversations before touching Stripe again.</p></div></div>
+    </div>
+
+    <div class="grp"><div class="gt">User experience, retention, trust</div>
+
+      <div class="dim s2"><div class="left"><span class="name">Onboarding</span><div class="score"><span class="num mono">2</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Search works logged out, which is the right call: value before sign-in. But the home page carries an intro animation, feature cards, feature sections, a pricing preview, a support CTA, a closing CTA, and search tips alongside the search box. Ask requires sign-in with no in-context explanation of why. The framework and Apple's guidance both say: let the user experience the product before nonessential content.</p>
+        <ul class="checks"><li class="y">Core action available without account</li><li class="n">Nonessential content deferred</li><li class="p">Permissions (sign-in) requested in context</li><li class="n">Time-to-value measurable</li></ul>
+        <p class="fix">Home page becomes search box, topic chips, Search/Ask toggle. Everything else moves to About, Help, Pricing.</p></div></div>
+
+      <div class="dim su"><div class="left"><span class="name">Retention</span><div class="score"><span class="num mono">unknown</span></div><span class="ev">Refused</span></div>
+        <div class="right"><p class="sum">Daily-word streaks exist, which is a retention mechanic, not a retention measurement. No cohort table, no return-interval calculation. The natural cadence is weekly for sermon prep and daily for devotional reading; neither is tracked.</p>
+        <ul class="checks"><li class="u">Cohort retention at weekly interval</li><li class="p">Return mechanism exists (streaks, install banner)</li><li class="n">Return mechanism measured</li></ul>
+        <p class="fix">Weekly active accounts by sign-up week. One query over the existing search log.</p></div></div>
+
+      <div class="dim su"><div class="left"><span class="name">Engagement</span><div class="score"><span class="num mono">unknown</span></div><span class="ev">Refused</span></div>
+        <div class="right"><p class="sum">Searches per user is available in the store. The framework says search count is activity, not value; "meaningful engagement" has to be defined first, and it is not. Deep-study quota usage and bench adds are the nearest proxies and neither is surfaced.</p>
+        <ul class="checks"><li class="n">Meaningful engagement defined</li><li class="y">Time-on-site not treated as a goal</li><li class="u">Depth and breadth per user</li></ul>
+        <p class="fix">Define it: a session with at least one quote copied, benched, or read in context.</p></div></div>
+
+      <div class="dim s3"><div class="left"><span class="name">Core UX patterns</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Navigation is conventional (header, mobile nav, footer). Search results handle empty and loading states, 18 components carry loading logic. Confidence and citation badges make system state visible. No <code>error.tsx</code> or <code>not-found.tsx</code> anywhere in <code>app/</code>, so a thrown route error falls to Next's default screen. No offline state despite an installable web-app manifest.</p>
+        <ul class="checks"><li class="y">Primary action obvious</li><li class="y">System state visible (badges, toasts)</li><li class="y">Empty and loading states</li><li class="n">Route-level error boundary</li><li class="n">Offline state</li><li class="y">Recognition over recall (topic chips)</li></ul>
+        <p class="fix">Add `app/error.tsx` and `app/not-found.tsx`. Twenty lines.</p></div></div>
+
+      <div class="dim s3"><div class="left"><span class="name">Interaction design</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">base-ui and shadcn primitives, toast feedback via sonner, modals for source detail and read-in-context. Competent and predictable. Not user-tested, no mis-tap or abandonment data, and animation components have no reduced-motion path.</p>
+        <ul class="checks"><li class="y">Feedback on every action</li><li class="y">Consistent primitives</li><li class="n">Reduced-motion respected</li><li class="u">Input error rate</li></ul>
+        <p class="fix">One `@media (prefers-reduced-motion: reduce)` block in globals.css that stills the intro and explainer animations.</p></div></div>
+
+      <div class="dim s2"><div class="left"><span class="name">Accessibility</span><div class="score"><span class="num mono">2</span><span class="of">/ 5</span></div><span class="ev">Observed · gate</span></div>
+        <div class="right"><p class="sum">Semantic primitives help, and images have alt text. But there is no WCAG pass on record, focus visibility is inconsistent, and motion cannot be disabled. Reading preferences (font size, sepia) show care for legibility, which is exactly the right instinct for this audience, so the gap is process rather than intent.</p>
+        <ul class="checks"><li class="p">Keyboard focus visible (21 sites)</li><li class="y">Images have alt text (5 of 5)</li><li class="y">Labels and aria on controls (24 sites)</li><li class="n">Reduced motion</li><li class="n">Screen-reader test performed</li><li class="p">Contrast (one fix already needed)</li></ul>
+        <p class="fix">Run axe on Search, Ask, Today. Fix what it lists. Record the date in AGENTS.md.</p></div></div>
+
+      <div class="dim s3"><div class="left"><span class="name">Security / privacy</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Solid for the data class. Google OAuth code flow with an HMAC-signed cookie, no third-party auth library, no database to breach. 34 server-side 401/403 checks across API routes. Stripe webhook verifies signatures. Secrets live in gitignored env files and root-only systemd EnvironmentFiles. Per-user quotas cap AI spend. What is missing is data lifecycle: no retention or deletion policy for the per-email logs, and moderation of wiki contributions fails open by design.</p>
+        <ul class="checks"><li class="y">Authorization server-enforced</li><li class="y">Secrets out of repo</li><li class="y">Payment webhook verified</li><li class="y">Abuse quotas on AI routes</li><li class="n">Retention / deletion policy</li><li class="n">Threat model written</li><li class="u">Dependency scanning</li></ul>
+        <p class="fix">A `/api/auth/delete` route that removes the user's rows from the store, plus one paragraph on retention.</p></div></div>
+
+      <div class="dim s1"><div class="left"><span class="name">Legal / compliance</span><div class="score"><span class="num mono">1</span><span class="of">/ 5</span></div><span class="ev">Observed · gate</span></div>
+        <div class="right"><p class="sum">A public app taking payments and storing personal data with no privacy policy, no terms, and no deletion path. Separately, the corpus is a publisher's copyrighted material and the repo does not document the permission under which it is redistributed and paraphrased by AI. The photo wiki will add likeness and consent questions. The framework is clear that an AI checklist cannot establish compliance; a human needs to.</p>
+        <ul class="checks"><li class="n">Privacy policy</li><li class="n">Terms of service</li><li class="n">Account deletion</li><li class="n">Corpus licence documented</li><li class="u">Regional rules for NY users (SHIELD Act)</li></ul>
+        <p class="fix">Privacy and terms pages this week. Corpus permission in writing from the region before the public launch widens.</p></div></div>
+    </div>
+
+    <div class="grp"><div class="gt">Engineering, scale, systems</div>
+
+      <div class="dim s3"><div class="left"><span class="name">Performance</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Search is an in-memory cosine over 58 MB of embeddings, fast at this scale. Related-verse and explain results are cached in the store and pre-warmed by scripts. Risk sits at the edges: every semantic query first hits Ollama for the query vector, on a single VPS with 4 GB swap. No p95 measured, no budget set. The 20 MB quotes.json is bundled into the server, not the client, which is correct.</p>
+        <ul class="checks"><li class="y">Heavy data server-side only</li><li class="y">AI results cached and pre-warmed</li><li class="n">Latency budget for search</li><li class="n">Tail latency measured</li><li class="u">Low-end device or slow network tested</li></ul>
+        <p class="fix">Log search duration to the existing store. Read p95 once a week.</p></div></div>
+
+      <div class="dim s2"><div class="left"><span class="name">Reliability</span><div class="score"><span class="num mono">2</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Keyword fallback if Ollama is down is real graceful degradation. Help bot degrades to static text without its key. Moderation fails open. Those are good instincts. But 24 of 39 API routes wrap in try/catch, no health endpoint, no monitoring, no SLO, and an append-only JSONL store with no backup step in deploy. A single box in each tier.</p>
+        <ul class="checks"><li class="y">Search degrades gracefully</li><li class="p">Error handling (24 of 39 routes)</li><li class="n">Health endpoint or uptime check</li><li class="n">SLI or SLO for core journeys</li><li class="n">Store backup before deploy</li></ul>
+        <p class="fix">`/api/health` returning Ollama and OpenAI reachability, checked by a scheduled uptime job.</p></div></div>
+
+      <div class="dim s3"><div class="left"><span class="name">Engineering practices</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">50 tests pass across attribution, context building, scoring, Bible chunking. 14 runtime dependencies, deliberately no auth library and no ORM. CI auto-deploys main to dev. Deploy script separates dev and prod branches with a release marker so main can never land on prod by accident. On the other side: ESLint does not run (config migration pending), there is no prod CI, and rollback is a manual git operation.</p>
+        <ul class="checks"><li class="y">Critical logic tested</li><li class="y">Lean dependency set</li><li class="y">Dev CI</li><li class="y">Prod isolated behind a release branch</li><li class="n">Lint runs</li><li class="n">Documented rollback</li><li class="p">Observability (console only)</li></ul>
+        <p class="fix">Fix the ESLint flat-config migration so `npm run lint` runs again, then add it to CI.</p></div></div>
+
+      <div class="dim s2"><div class="left"><span class="name">Scalability</span><div class="score"><span class="num mono">2</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Right-sized for hundreds of users. A 10× scenario breaks in known places: the JSONL store reads whole files on request (10 sync reads in store.ts), one Ollama process serializes embedding calls, and one Node process holds 90 MB of embeddings. None of this is wrong today; the framework warns against premature distribution. It is unplanned rather than unscalable.</p>
+        <ul class="checks"><li class="y">No premature complexity</li><li class="n">10× scenario written down</li><li class="n">Store hotspot acknowledged</li><li class="y">AI cost scales with tier gating</li></ul>
+        <p class="fix">One paragraph in AGENTS.md: at what user count the store moves to SQLite, and who decides.</p></div></div>
+
+      <div class="dim s2"><div class="left"><span class="name">Localization</span><div class="score"><span class="num mono">2</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">English, Korean, Japanese in a hand-rolled i18n module with 60 keys, a language toggle, and a translate route. Twenty of 53 components read from it, so the rest are English-only. No plural or date rules, no layout-expansion test for CJK. The audience genuinely spans these three languages, so this matters more than for most apps.</p>
+        <ul class="checks"><li class="p">Strings externalized (20 of 53 components)</li><li class="y">Three target locales present</li><li class="n">Plural, date, number rules</li><li class="n">Layout tested in Korean and Japanese</li></ul>
+        <p class="fix">Grep for hard-coded English in the 33 untranslated components and move the header, search, and results strings first.</p></div></div>
+
+      <div class="dim s3"><div class="left"><span class="name">Design system</span><div class="score"><span class="num mono">3</span><span class="of">/ 5</span></div><span class="ev">Observed</span></div>
+        <div class="right"><p class="sum">Tailwind v4 tokens, shadcn and base-ui components, next-themes for dark mode, reading preferences layered on top. Consistent. No visual-regression check and no governance doc, which is proportionate for one maintainer.</p>
+        <ul class="checks"><li class="y">Semantic tokens used consistently</li><li class="y">Accessibility states from primitives</li><li class="n">Visual regression</li><li class="y">Platform conventions kept</li></ul>
+        <p class="fix">None needed now.</p></div></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <div><div class="eyebrow">Final judgment</div><h2>Strong bones, no instruments, three doors open</h2></div>
+    </div>
+    <div class="judge">
+      <div class="c"><h3>Strongest reasons to win</h3><ol><li>The value proposition is unusually clear and the corpus, attribution guard, and read-in-context make it real.</li><li>Engineering discipline: tests, lean deps, server-side gating, a prod branch that main cannot reach.</li><li>Search Lab. Blind retrieval evaluation is something most funded teams never build.</li></ol></div>
+      <div class="c"><h3>Strongest reasons to fail</h3><ol><li>Nothing measures whether the product works. Every roadmap decision is intuition.</li><li>Legal exposure grows with every sign-up and every Stripe charge made without terms.</li><li>Surface sprawl. Twelve features before one is proven dilutes both the product and the maintainer.</li></ol></div>
+      <div class="c"><h3>Critical unknowns</h3><ul><li>Weekly return rate of signed-in pastors.</li><li>Share of searches ending in a used quote.</li><li>p95 search latency on the production VPS under real load.</li><li>Corpus redistribution rights.</li></ul></div>
+    </div>
+    <div class="next">
+      <div>
+        <div class="eyebrow">Highest-leverage fixes, in order</div>
+        <h2>One week of work closes all three gates</h2>
+        <p>None of these needs a design decision. All are reversible. Together they move the verdict from Iterate to Conditional Go.</p>
+      </div>
+      <div>
+        <ol>
+          <li>Privacy policy, terms, and an account-deletion route.</li>
+          <li>Swap the dead Vercel import for self-hosted analytics. Fire one value event.</li>
+          <li>Reduced-motion block, `error.tsx`, `not-found.tsx`, axe pass on three pages.</li>
+          <li>Fix ESLint, add it to CI. Add `/api/health`.</li>
+          <li>Write three non-goals. Stop shipping surfaces until step 2 has four weeks of data.</li>
+        </ol>
+      </div>
+    </div>
+    <p class="foot">Method: static read of the app repository and its data pipeline, deploy scripts, CI, service unit, and docs; test suite and lint executed locally. Framework: "What Makes an App Exceptional" (HEART, Jobs-to-be-Done, Nielsen heuristics, WCAG 2.2, OWASP, SRE, DORA; 0–5 dimension scores; noncompensatory gates; evidence over inference). No tester feedback consulted. Scores are reviewer judgment on observed evidence; dimensions the framework forbids inferring from code are marked unknown.</p>
+  </section>
+</div>

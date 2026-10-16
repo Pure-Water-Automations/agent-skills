@@ -1,0 +1,582 @@
+<title>Sprout, Beyond Q&A — 30 Ideas & Top 5</title>
+<style>
+  :root{
+    --paper:#F6F9FA; --ink:#17263D; --muted:#5C6B7E; --line:#D8E1E8;
+    --aqua:#1FA9C9; --aqua-soft:#E2F4F9; --navy:#1E3A5F;
+    --card:#FFFFFF; --wf-bg:#FBFDFE; --wf-line:#B9C7D2; --wf-fill:#E8EEF3;
+    --s:#2E9E6B; --m:#C98A17; --l:#C24D4D;
+    --shadow:0 1px 3px rgba(23,38,61,.08), 0 8px 24px rgba(23,38,61,.06);
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#0E1726; --ink:#E8EEF4; --muted:#93A3B5; --line:#26364B;
+      --aqua:#3FC3E0; --aqua-soft:#12293A; --navy:#B9D4EE;
+      --card:#152238; --wf-bg:#111D30; --wf-line:#3A4D66; --wf-fill:#1D2C44;
+      --shadow:0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0E1726; --ink:#E8EEF4; --muted:#93A3B5; --line:#26364B;
+    --aqua:#3FC3E0; --aqua-soft:#12293A; --navy:#B9D4EE;
+    --card:#152238; --wf-bg:#111D30; --wf-line:#3A4D66; --wf-fill:#1D2C44;
+    --shadow:0 1px 3px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+  :root[data-theme="light"]{
+    --paper:#F6F9FA; --ink:#17263D; --muted:#5C6B7E; --line:#D8E1E8;
+    --aqua:#1FA9C9; --aqua-soft:#E2F4F9; --navy:#1E3A5F;
+    --card:#FFFFFF; --wf-bg:#FBFDFE; --wf-line:#B9C7D2; --wf-fill:#E8EEF3;
+    --s:#2E9E6B; --m:#C98A17; --l:#C24D4D;
+    --shadow:0 1px 3px rgba(23,38,61,.08), 0 8px 24px rgba(23,38,61,.06);
+  }
+  html{background:var(--paper)}
+  body{
+    font-family:"Avenir Next","Segoe UI",Seravek,Verdana,system-ui,sans-serif;
+    color:var(--ink); background:var(--paper); line-height:1.55; margin:0;
+  }
+  .wrap{max-width:1020px; margin:0 auto; padding:48px 24px 80px}
+  header.hero{display:flex; gap:20px; align-items:center; margin-bottom:8px}
+  .mascot{
+    width:72px;height:72px;border-radius:50%;flex:none;
+    background:radial-gradient(circle at 35% 30%, var(--aqua) 0%, #1179A0 85%);
+    position:relative; box-shadow:var(--shadow);
+  }
+  .mascot::before{content:""; position:absolute; left:20px; top:26px; width:9px;height:13px;border-radius:50%;background:#fff}
+  .mascot::after{content:""; position:absolute; right:20px; top:26px; width:9px;height:13px;border-radius:50%;background:#fff}
+  .mascot .smile{position:absolute; left:50%; top:47px; width:22px;height:11px; transform:translateX(-50%);
+    border:3px solid #fff;border-top:none;border-radius:0 0 22px 22px}
+  h1{font-size:clamp(1.7rem,4vw,2.4rem); line-height:1.15; margin:0; letter-spacing:-.02em; text-wrap:balance; color:var(--navy)}
+  .sub{color:var(--muted); margin:4px 0 0; font-size:1.02rem; max-width:62ch}
+  .eyebrow{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.72rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--aqua); font-weight:600}
+  h2{font-size:1.45rem; margin:56px 0 6px; letter-spacing:-.01em; color:var(--navy); text-wrap:balance}
+  h2 .n{color:var(--aqua)}
+  .lede{color:var(--muted); margin:0 0 20px; max-width:70ch}
+
+  /* summary strip */
+  .strip{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:28px 0 6px}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:14px 16px; box-shadow:var(--shadow)}
+  .stat b{display:block; font-size:1.5rem; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+  .stat span{color:var(--muted); font-size:.85rem}
+
+  /* live decision tally */
+  .tally{position:sticky; top:0; z-index:20; display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    background:var(--card); border:1px solid var(--line); border-radius:12px; padding:10px 16px; margin:22px 0 4px; box-shadow:var(--shadow)}
+  .tally .t{font-size:.85rem; color:var(--muted)}
+  .tally .t b{font-variant-numeric:tabular-nums; font-size:1.05rem; margin-right:4px}
+  .tally .t.impl b{color:var(--s)} .tally .t.hold b{color:var(--m)} .tally .t.rej b{color:var(--l)}
+  .tally .spacer{flex:1}
+  .tally a{color:var(--aqua); font-size:.82rem; font-weight:600; text-decoration:none}
+
+  /* decision toggles */
+  .tog{display:flex; gap:5px; flex-wrap:wrap}
+  .tog button{font-family:ui-monospace,Menlo,monospace; font-size:.66rem; font-weight:700; letter-spacing:.03em;
+    border:1.5px solid var(--line); background:var(--card); color:var(--muted); border-radius:7px; padding:3px 9px; cursor:pointer}
+  .tog button:hover{border-color:var(--aqua)}
+  .tog button:focus-visible{outline:2px solid var(--aqua); outline-offset:1px}
+  .tog button[aria-pressed="true"][data-c="implement"]{background:var(--s); border-color:var(--s); color:#fff}
+  .tog button[aria-pressed="true"][data-c="hold"]{background:var(--m); border-color:var(--m); color:#fff}
+  .tog button[aria-pressed="true"][data-c="reject"]{background:var(--l); border-color:var(--l); color:#fff}
+  .tog.big{margin-top:14px}
+  .tog.big button{font-size:.78rem; padding:6px 14px; border-radius:9px}
+  td .tog button{padding:2px 7px}
+  tr.st-implement td:first-child{box-shadow:inset 3px 0 0 var(--s)}
+  tr.st-hold td:first-child{box-shadow:inset 3px 0 0 var(--m)}
+  tr.st-reject td:first-child{box-shadow:inset 3px 0 0 var(--l)}
+
+  /* idea sections */
+  .idea{display:grid; grid-template-columns:minmax(280px,5fr) minmax(320px,6fr); gap:28px; align-items:start;
+    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:26px 28px; margin:18px 0; box-shadow:var(--shadow)}
+  @media (max-width:760px){ .idea{grid-template-columns:1fr} }
+  .idea h3{margin:2px 0 8px; font-size:1.22rem; letter-spacing:-.01em}
+  .idea p{margin:8px 0; font-size:.95rem}
+  .idea .who{color:var(--muted); font-size:.83rem; margin-top:12px}
+  .idea .who b{color:var(--ink)}
+  .chip{display:inline-block; font-family:ui-monospace,Menlo,monospace; font-size:.7rem; font-weight:700;
+    padding:2px 9px; border-radius:99px; letter-spacing:.06em; vertical-align:2px; margin-left:8px; color:#fff}
+  .chip.S{background:var(--s)} .chip.M{background:var(--m)} .chip.L{background:var(--l)}
+  .cpo{border-left:3px solid var(--aqua); background:var(--aqua-soft); padding:8px 12px; border-radius:0 8px 8px 0;
+    font-size:.86rem; margin-top:12px}
+  .cpo b{color:var(--aqua)}
+  .covers{font-size:.72rem; color:var(--muted); margin-top:6px; font-family:ui-monospace,Menlo,monospace}
+
+  /* ── wireframe kit ─────────────────────────────── */
+  .wf{background:var(--wf-bg); border:1px solid var(--wf-line); border-radius:10px; padding:14px; position:relative; overflow:hidden}
+  .wf *{box-sizing:border-box}
+  .wf .frame{border:1.5px solid var(--wf-line); border-radius:8px; background:var(--card); overflow:hidden}
+  .wf .titlebar{height:18px; border-bottom:1.5px solid var(--wf-line); display:flex; align-items:center; gap:4px; padding:0 8px}
+  .wf .dot{width:6px;height:6px;border-radius:50%;background:var(--wf-line)}
+  .wf .cols{display:flex}
+  .wf .side{width:26%; border-right:1.5px solid var(--wf-line); padding:8px 7px; display:flex; flex-direction:column; gap:6px}
+  .wf .main{flex:1; padding:10px; position:relative}
+  .bar{height:8px; border-radius:4px; background:var(--wf-fill)}
+  .bar.w40{width:40%}.bar.w55{width:55%}.bar.w70{width:70%}.bar.w85{width:85%}
+  .bar.hot{background:var(--aqua); opacity:.85}
+  .row{display:flex; gap:6px; align-items:center; margin:7px 0}
+  .pill{font-size:.62rem; font-weight:700; font-family:ui-monospace,Menlo,monospace; padding:2px 8px; border-radius:99px;
+    background:var(--aqua); color:#fff; white-space:nowrap}
+  .pill.ghost{background:transparent; color:var(--aqua); border:1.5px solid var(--aqua)}
+  .bub{border:1.5px solid var(--wf-line); background:var(--card); border-radius:10px; padding:9px 11px; font-size:.72rem; color:var(--ink)}
+  .bub.sprout{border-color:var(--aqua); background:var(--aqua-soft)}
+  .bub.you{margin-left:22%; background:var(--wf-fill)}
+  .bub b{font-weight:700}
+  .fab{width:34px;height:34px;border-radius:50%; background:radial-gradient(circle at 35% 30%, var(--aqua), #1179A0);
+    position:absolute; right:12px; bottom:12px; box-shadow:var(--shadow)}
+  .fab::after{content:"◡"; color:#fff; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:13px; padding-bottom:3px}
+  .ring{position:absolute; inset:-5px; border-radius:50%; border:2.5px solid var(--s); border-right-color:var(--wf-line); transform:rotate(40deg)}
+  .spot{outline:2.5px solid var(--aqua); outline-offset:2px; border-radius:5px; box-shadow:0 0 0 6px color-mix(in srgb, var(--aqua) 18%, transparent)}
+  .note{position:absolute; font-family:ui-monospace,Menlo,monospace; font-size:.62rem; color:var(--aqua); font-weight:700;
+    background:var(--card); border:1px solid var(--aqua); border-radius:6px; padding:2px 7px; box-shadow:var(--shadow); z-index:3; line-height:1.35}
+  .caption{font-size:.75rem; color:var(--muted); margin-top:10px; text-align:center}
+  .check{display:flex; gap:8px; align-items:center; font-size:.72rem; margin:6px 0}
+  .box{width:13px;height:13px;border:1.5px solid var(--wf-line); border-radius:4px; flex:none; display:flex;align-items:center;justify-content:center; font-size:.62rem}
+  .box.done{background:var(--s); border-color:var(--s); color:#fff}
+  .muted{color:var(--muted)}
+  .rankrow{display:flex; gap:8px; align-items:center; border:1.5px solid var(--wf-line); border-radius:8px; padding:7px 9px; margin:7px 0; background:var(--card); font-size:.72rem}
+  .rankrow .num{width:17px;height:17px;border-radius:50%; color:#fff; background:#1E3A5F; font-size:.62rem; font-weight:800;
+    display:flex;align-items:center;justify-content:center; flex:none; font-family:ui-monospace,Menlo,monospace}
+  .go{margin-left:auto; flex:none}
+  .field{display:flex; gap:8px; align-items:center; margin:6px 0; font-size:.68rem}
+  .field .lab{width:34%; color:var(--muted); font-family:ui-monospace,Menlo,monospace; font-size:.6rem; text-transform:uppercase; letter-spacing:.05em}
+  .field .val{flex:1; border:1.5px solid var(--wf-line); border-radius:6px; padding:4px 8px; background:var(--card)}
+  .field .val.hot{border-color:var(--aqua); background:var(--aqua-soft)}
+
+  /* 30-idea table */
+  .theme{margin:34px 0 8px; font-size:1.02rem; font-weight:700; color:var(--navy); letter-spacing:.01em}
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); box-shadow:var(--shadow)}
+  table{border-collapse:collapse; width:100%; min-width:780px; font-size:.88rem}
+  th{font-family:ui-monospace,Menlo,monospace; font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+    text-align:left; padding:12px 14px 8px; border-bottom:1px solid var(--line)}
+  td{padding:10px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  td.n{font-family:ui-monospace,Menlo,monospace; color:var(--muted); font-size:.78rem; white-space:nowrap; font-variant-numeric:tabular-nums}
+  td b{font-weight:650}
+  td .d{color:var(--muted); font-size:.83rem; display:block; margin-top:1px}
+  .from{font-size:.74rem; color:var(--muted); white-space:nowrap}
+  .verdict{font-size:.8rem; color:var(--muted); max-width:30ch}
+  .verdict.warn{color:var(--l)}
+  .verdict.love{color:var(--s)}
+  .star{color:var(--aqua); font-weight:700}
+
+  /* decision summary */
+  .summary{margin-top:44px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px 26px; box-shadow:var(--shadow)}
+  .summary h2{margin:0 0 10px}
+  #summaryText{width:100%; box-sizing:border-box; min-height:180px; resize:vertical; border:1.5px solid var(--line); border-radius:10px;
+    background:var(--wf-bg); color:var(--ink); font-family:ui-monospace,Menlo,monospace; font-size:.78rem; line-height:1.6; padding:12px 14px}
+  .summary-actions{display:flex; gap:12px; align-items:center; margin-top:12px; flex-wrap:wrap}
+  #copyBtn{font-family:inherit; font-size:.9rem; font-weight:700; background:var(--aqua); color:#fff; border:none;
+    border-radius:9px; padding:9px 18px; cursor:pointer}
+  #copyBtn:hover{filter:brightness(1.07)}
+  #copyBtn:focus-visible{outline:2px solid var(--navy); outline-offset:2px}
+  #resetBtn{font-family:inherit; font-size:.82rem; background:transparent; color:var(--muted); border:1.5px solid var(--line);
+    border-radius:9px; padding:8px 14px; cursor:pointer}
+  #copyStatus{font-size:.82rem; color:var(--s); font-weight:600}
+  .summary .hint{font-size:.82rem; color:var(--muted); margin:2px 0 12px}
+
+  .method{margin-top:56px; border-top:1px solid var(--line); padding-top:22px; color:var(--muted); font-size:.85rem; max-width:75ch}
+  .method b{color:var(--ink)}
+  .personas{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin:16px 0}
+  .persona{border:1px solid var(--line); border-radius:10px; padding:10px 13px; background:var(--card); font-size:.82rem}
+  .persona b{display:block; font-size:.9rem; color:var(--ink)}
+  .persona span{color:var(--muted)}
+  .persona .eng{font-family:ui-monospace,Menlo,monospace; font-size:.64rem; color:var(--aqua); text-transform:uppercase; letter-spacing:.08em}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="mascot"><div class="smile"></div></div>
+    <div>
+      <div class="eyebrow">Team Ops Console · Product Panel · Jul 17, 2026</div>
+      <h1>Sprout, Beyond Q&amp;A</h1>
+      <p class="sub">Six AI panelists with different jobs brainstormed how to grow Sprout from a question-answering mascot into a guide that briefs, navigates, drafts, and coaches. A skeptical CPO pass then stress-tested every idea. <b>Decide each idea below</b> — Implement, Hold, or Reject — then copy the decision summary at the bottom back into chat.</p>
+    </div>
+  </header>
+
+  <div class="strip">
+    <div class="stat"><b>48</b><span>raw ideas generated</span></div>
+    <div class="stat"><b>30</b><span>after de-duplication</span></div>
+    <div class="stat"><b>6</b><span>personas (Codex · Antigravity · Claude)</span></div>
+    <div class="stat"><b>5</b><span>top picks, wireframed below</span></div>
+  </div>
+
+  <div class="tally" role="status" aria-live="polite">
+    <span class="t impl"><b id="cImpl">0</b> implement</span>
+    <span class="t hold"><b id="cHold">0</b> hold</span>
+    <span class="t rej"><b id="cRej">0</b> reject</span>
+    <span class="t"><b id="cUnd">30</b> undecided</span>
+    <span class="spacer"></span>
+    <a href="#decisions">Jump to summary ↓</a>
+  </div>
+
+  <h2><span class="n">Top 5</span> — what to build</h2>
+  <p class="lede">Ranked by panel convergence (how many personas independently proposed it), CPO verdict, and fit with what already exists in the code. Deciding a card decides every idea it covers; fine-tune individual ideas in the full list below.</p>
+
+  <!-- 1 ─────────────────────────────────────────── -->
+  <section class="idea">
+    <div>
+      <div class="eyebrow">#1 · Proactive</div>
+      <h3>Sprout Briefing — Next Best Action <span class="chip M">M</span></h3>
+      <p>Replace today’s greeting (“You have 9 pending items”) with a <b>ranked plan</b>: the top 3 things to do first, in order, each with a one-line <i>why</i> and an <b>Open →</b> button. Finish one, the next surfaces.</p>
+      <p>4 of 6 panelists proposed this independently — the strongest convergence in the whole panel. It reuses <code>notificationsForView()</code>, which already aggregates pending work per role.</p>
+      <div class="who">Proposed by <b>Marisol</b> (Ops), <b>Priya</b> (Growth PM), <b>Dex</b> (Engineer), <b>Jomar</b> (new VA)</div>
+      <div class="cpo"><b>CPO check:</b> notification items today carry only label + count — no age, deadline, or owner. The real work is enriching them with urgency metadata; reordering counts isn’t prioritization.</div>
+      <div class="tog big" data-key="i1" data-name="Next Best Action briefing" role="group" aria-label="Decision: Next Best Action briefing"></div>
+      <div class="covers">covers idea #1</div>
+    </div>
+    <div>
+      <div class="wf">
+        <div class="frame">
+          <div class="titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div style="padding:10px 12px">
+            <div class="bub sprout" style="margin-bottom:8px"><b>Morning, Sam!</b> Payroll closes today — start here. Then two tier reviews are waiting on you.</div>
+            <div class="rankrow"><span class="num">1</span> Lock &amp; close July payroll <span class="muted">· due today</span> <span class="pill go">Open →</span></div>
+            <div class="rankrow"><span class="num">2</span> Tier review — Maya <span class="muted">· waiting 4 days</span> <span class="pill ghost go">Open →</span></div>
+            <div class="rankrow"><span class="num">3</span> Capacity flag — Theo underutilized <span class="pill ghost go">Open →</span></div>
+            <div style="font-size:.68rem; color:var(--muted); margin-top:8px">…and 6 smaller things · <span style="color:var(--aqua); font-weight:700">show all</span></div>
+          </div>
+        </div>
+        <div class="note" style="top:20px; right:18px">greeting → ranked plan</div>
+      </div>
+      <div class="caption">The chat’s first message becomes a prioritized briefing, not a badge count.</div>
+    </div>
+  </section>
+
+  <!-- 2 ─────────────────────────────────────────── -->
+  <section class="idea">
+    <div>
+      <div class="eyebrow">#2 · Navigation</div>
+      <h3>Take Me There — wayfinding kit <span class="chip S">S</span></h3>
+      <p>Every how-to answer ends in a <b>button, not a paragraph</b>. Sprout emits a typed route ID alongside the answer; the bubble renders <b>Take me there →</b>, navigates, and flashes the existing tour spotlight on the exact control when you arrive.</p>
+      <p>Same rails power <i>“go to payroll archive”</i> as a direct command, and a “show me” pulse on any button an answer names. This is the whole “help people who are lost” ask — and the spotlight machinery already exists.</p>
+      <div class="who">Proposed by <b>Wren</b> (UX), <b>Dex</b> (Engineer), <b>Jomar</b> (new VA)</div>
+      <div class="cpo"><b>CPO check:</b> the model must pick stable route IDs from one shared allow-list catalog (shared with tours + notifications) — never emit raw URLs.</div>
+      <div class="tog big" data-key="i8" data-name="Take Me There buttons" role="group" aria-label="Decision: Take Me There wayfinding kit"></div>
+      <div class="covers">covers idea #8</div>
+    </div>
+    <div>
+      <div class="wf">
+        <div class="frame">
+          <div class="titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div class="cols">
+            <div class="side">
+              <div class="bar w70"></div>
+              <div class="bar w55"></div>
+              <div class="bar w70 spot" style="height:10px"></div>
+              <div class="bar w40"></div>
+              <div class="bar w55"></div>
+            </div>
+            <div class="main" style="min-height:130px">
+              <div class="bub you">How do I approve Maya’s promotion?</div>
+              <div class="bub sprout" style="margin-top:8px">Head to <b>Daily → Tier Reviews</b>, find Maya’s row, and click <b>Approve</b>.<br><span class="pill" style="margin-top:6px; display:inline-block">Take me there →</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="note" style="bottom:18px; left:16px">arrival spotlight on the nav item</div>
+      </div>
+      <div class="caption">Answers become one tap; the spotlight lands on the target when the page opens.</div>
+    </div>
+  </section>
+
+  <!-- 3 ─────────────────────────────────────────── -->
+  <section class="idea">
+    <div>
+      <div class="eyebrow">#3 · Context</div>
+      <h3>Page-Aware Sprout <span class="chip S">S</span></h3>
+      <p>Sprout knows <b>what page you’re on</b> before you ask. Opening the panel shows a contextual chip — <i>“What can I do on this page?”</i> — and answers say “you’re already here, click <b>Approve</b> on the row” instead of directions from the lobby.</p>
+      <p>Add <b>Summarize this page</b> (“who’s overloaded on Workload right now”) and short-window chat memory so “what about the second one?” just works. Today the model gets neither the page nor any history.</p>
+      <div class="who">Proposed by <b>Dex</b>, <b>Wren</b>, <b>Marisol</b>, <b>Kade</b> (AI Strategist)</div>
+      <div class="cpo"><b>CPO check:</b> pathname is cheap and safe; record-level context needs a server-authorized provider. Start memory as a bounded ephemeral window (last 4–6 turns), not new tables.</div>
+      <div class="tog big" data-key="i14" data-also="i15,i16" data-name="Page-aware answers" role="group" aria-label="Decision: Page-Aware Sprout bundle"></div>
+      <div class="covers">covers ideas #14 · #15 · #16</div>
+    </div>
+    <div>
+      <div class="wf">
+        <div class="frame">
+          <div class="titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div class="cols">
+            <div class="side">
+              <div class="bar w70"></div><div class="bar w55"></div><div class="bar w70 hot"></div><div class="bar w40"></div>
+            </div>
+            <div class="main" style="min-height:135px">
+              <div class="row"><div class="bar w40" style="height:10px"></div></div>
+              <div class="row"><div class="bar w85"></div></div>
+              <div class="row"><div class="bar w70"></div></div>
+              <div style="border:1.5px solid var(--aqua); border-radius:10px; background:var(--aqua-soft); padding:8px 10px; margin-top:10px; font-size:.7rem">
+                <span class="pill ghost">✦ What can I do on this page?</span>
+                <div class="bub sprout" style="margin-top:7px; border:none; background:transparent; padding:4px 2px">You’re on <b>Workload</b> — Theo has 9 open tasks, Maya has 1. Want me to suggest a rebalance?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="note" style="top:38px; right:14px">knows the route + live data</div>
+      </div>
+      <div class="caption">One contextual chip per page replaces the same four static suggestions everywhere.</div>
+    </div>
+  </section>
+
+  <!-- 4 ─────────────────────────────────────────── -->
+  <section class="idea">
+    <div>
+      <div class="eyebrow">#4 · Action</div>
+      <h3>Sprout Actions — draft, don’t just tell <span class="chip L">L</span></h3>
+      <p>Graduate the hidden Bypass machinery into a first-class, <b>role-scoped</b> feature. Say <i>“get someone to follow up with the Meridian client”</i> — Sprout drafts the task (title, least-busy assignee, priority, due date) and <b>opens the real form pre-filled</b>. You adjust and send.</p>
+      <p>Safe everyday actions (update my task status, claim a task) get the propose → confirm → audit flow that already exists; after any confirmed action Sprout shows the result with an <b>Open result</b> link.</p>
+      <div class="who">Proposed by <b>Marisol</b>, <b>Dex</b>, <b>Kade</b></div>
+      <div class="cpo"><b>CPO check:</b> the execute endpoint currently trusts client-sent tool + args. Opening this beyond admins requires actor-bound, expiring proposal tokens and a server-side per-role tool allow-list — that’s the real L in the estimate.</div>
+      <div class="tog big" data-key="i19" data-also="i20,i22" data-name="Role-scoped Sprout Actions" role="group" aria-label="Decision: Sprout Actions bundle"></div>
+      <div class="covers">covers ideas #19 · #20 · #22</div>
+    </div>
+    <div>
+      <div class="wf">
+        <div class="frame">
+          <div class="titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div style="padding:10px 12px">
+            <div class="bub you">Get someone to follow up with Meridian about the overdue invoice</div>
+            <div style="border:1.5px solid var(--aqua); border-radius:10px; padding:9px 11px; margin-top:8px; background:var(--card)">
+              <div class="eyebrow" style="font-size:.6rem">Draft task — you review before it sends</div>
+              <div class="field"><span class="lab">Title</span><span class="val">Follow up: Meridian overdue invoice</span></div>
+              <div class="field"><span class="lab">Assignee</span><span class="val hot">Theo · least busy (2 open)</span></div>
+              <div class="field"><span class="lab">Due</span><span class="val">Fri, Jul 24</span></div>
+              <div style="margin-top:8px"><span class="pill">Open pre-filled form →</span> <span class="pill ghost">Discard</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="note" style="top:56px; right:14px">drafts, never sends itself</div>
+      </div>
+      <div class="caption">Plain English in, a reviewed draft out — the human still owns the send.</div>
+    </div>
+  </section>
+
+  <!-- 5 ─────────────────────────────────────────── -->
+  <section class="idea">
+    <div>
+      <div class="eyebrow">#5 · Coaching</div>
+      <h3>Get Set Up — Week-1 companion <span class="chip M">M</span></h3>
+      <p>Retire the 18-stop lecture tour. New users get a per-role <b>checklist that checks itself off</b> from real signals — first task opened, first check-in submitted, first claim — with a progress ring on the mascot until it’s done. Resumable, never lost on reload.</p>
+      <p>Pair it with tappable reassurance chips (<i>“Is it normal I haven’t gotten a task yet?”</i>) and a tier encourager that frames the hours bar as progress toward <b>eligibility</b>, warm and concrete.</p>
+      <div class="who">Proposed by <b>Jomar</b>, <b>Wren</b>, <b>Priya</b></div>
+      <div class="cpo"><b>CPO check:</b> derive completion from authoritative events, not stored booleans; tie timing to onboarding state, not “Day 1/2/3”; never predict promotions — eligibility only.</div>
+      <div class="tog big" data-key="i26" data-name="Get Set Up checklist" role="group" aria-label="Decision: Get Set Up week-1 companion"></div>
+      <div class="covers">covers idea #26</div>
+    </div>
+    <div>
+      <div class="wf">
+        <div class="frame">
+          <div class="titlebar"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+          <div style="padding:10px 12px; min-height:150px; position:relative">
+            <div class="eyebrow" style="font-size:.6rem">Get set up · 3 of 6 done</div>
+            <div class="check"><span class="box done">✓</span> Visit your Overview</div>
+            <div class="check"><span class="box done">✓</span> Open your first task</div>
+            <div class="check"><span class="box done">✓</span> Read your Tier page</div>
+            <div class="check"><span class="box" style="border-color:var(--aqua)"></span> <b>Submit your first check-in</b> <span class="pill go">Do it now →</span></div>
+            <div class="check"><span class="box"></span> <span class="muted">Browse the Available pool</span></div>
+            <div class="check"><span class="box"></span> <span class="muted">Say hi to your supervisor</span></div>
+            <div class="fab"><div class="ring"></div></div>
+          </div>
+        </div>
+        <div class="note" style="bottom:14px; right:56px">progress ring on the mascot</div>
+      </div>
+      <div class="caption">Checks itself off as the new VA actually does the things — a companion, not a syllabus.</div>
+    </div>
+  </section>
+
+  <div class="cpo" style="margin:26px 0 0; font-size:.92rem"><b>Cheapest first move (the CPO’s pick):</b> ship the 👍/👎 <b>feedback loop</b> (#30 below) before any of these — it’s an S, and it’s the measurement spine that tells you whether everything above is actually working.</div>
+
+  <h2>All <span class="n">30 ideas</span> — decide each one</h2>
+  <p class="lede">De-duplicated from 48 raw proposals; each credited to the persona(s) who raised it, with the CPO panel’s verdict where it changed the picture. ★ = in the top 5. Decisions persist in this browser until you copy them out.</p>
+
+  <div class="theme">Proactive — Sprout speaks first</div>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:34px">#</th><th>Idea</th><th>From</th><th style="width:52px">Effort</th><th>Panel verdict</th><th style="width:150px">Decide</th></tr>
+    <tr><td class="n">1<span class="star">★</span></td><td><b>Next Best Action briefing</b><span class="d">Ranked “do these 3 first” plan replaces the badge-count greeting</span></td><td class="from">Ops · Growth · Eng · New&nbsp;VA</td><td><span class="chip M">M</span></td><td class="verdict love">Highest convergence; enrich items with urgency data first</td><td><div class="tog" data-key="i1" data-name="Next Best Action briefing"></div></td></tr>
+    <tr><td class="n">2</td><td><b>Anomaly callouts</b><span class="d">“Maya’s hours dropped 40% vs her 4-week average” — before it becomes a flag</span></td><td class="from">Ops</td><td><span class="chip L">L</span></td><td class="verdict">Needs PTO/holiday suppression or it manufactures urgency</td><td><div class="tog" data-key="i2" data-name="Anomaly callouts"></div></td></tr>
+    <tr><td class="n">3</td><td><b>Stuck-work rescue</b><span class="d">Detects a stalled task near due date, asks “blocked, or want the next step?”</span></td><td class="from">Growth</td><td><span class="chip L">L</span></td><td class="verdict">Pilot only on owned, due-dated tasks; measure dismissals</td><td><div class="tog" data-key="i3" data-name="Stuck-work rescue"></div></td></tr>
+    <tr><td class="n">4</td><td><b>Lost-signal rescue</b><span class="d">Bouncing between pages or hitting a 404 → gentle “looking for something?” — once per session</span></td><td class="from">UX</td><td><span class="chip M">M</span></td><td class="verdict">Must feel like a colleague noticing, not Clippy</td><td><div class="tog" data-key="i4" data-name="Lost-signal rescue"></div></td></tr>
+    <tr><td class="n">5</td><td><b>Friday wrap-up / weekly recap</b><span class="d">What got done, what’s at risk, what to walk into Monday knowing</span></td><td class="from">Ops · Growth</td><td><span class="chip L">L</span></td><td class="verdict">Define metrics formally or it presents contestable judgments</td><td><div class="tog" data-key="i5" data-name="Friday wrap-up / weekly recap"></div></td></tr>
+    <tr><td class="n">6</td><td><b>Welcome-back resume</b><span class="d">After absence: “You were setting up Acme onboarding; two items remain”</span></td><td class="from">Growth</td><td><span class="chip L">L</span></td><td class="verdict">Recompute live on return; don’t persist vague state</td><td><div class="tog" data-key="i6" data-name="Welcome-back resume"></div></td></tr>
+    <tr><td class="n">7</td><td><b>Celebrations &amp; streaks</b><span class="d">Milestone recognition + forgiving consistency streaks</span></td><td class="from">Growth</td><td><span class="chip M">M</span></td><td class="verdict warn">Defer — cadences conflict; risks rewarding status churn</td><td><div class="tog" data-key="i7" data-name="Celebrations &amp; streaks"></div></td></tr>
+  </table></div>
+
+  <div class="theme">Navigation &amp; wayfinding</div>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:34px">#</th><th>Idea</th><th>From</th><th style="width:52px">Effort</th><th>Panel verdict</th><th style="width:150px">Decide</th></tr>
+    <tr><td class="n">8<span class="star">★</span></td><td><b>Take Me There buttons</b><span class="d">Typed deep-link pill on every answer + arrival spotlight + “show me” pulse</span></td><td class="from">UX · Eng · New&nbsp;VA</td><td><span class="chip S">S</span></td><td class="verdict love">Route IDs from one shared allow-list, never model URLs</td><td><div class="tog" data-key="i8" data-name="Take Me There buttons"></div></td></tr>
+    <tr><td class="n">9</td><td><b>“Go to…” wayfinding</b><span class="d">“Where do check-ins live?” → confirm + navigate; same resolver behind Cmd+K</span></td><td class="from">UX</td><td><span class="chip M">M</span></td><td class="verdict">Rides on #8’s rails</td><td><div class="tog" data-key="i9" data-name="Go-to wayfinding / Cmd+K"></div></td></tr>
+    <tr><td class="n">10</td><td><b>Per-page micro-tours</b><span class="d">First visit to a route = 2–3 coach marks on that page, never the 18-stop tour</span></td><td class="from">UX · Eng</td><td><span class="chip M">M</span></td><td class="verdict">Needs state-aware steps or it’s just a shorter lecture</td><td><div class="tog" data-key="i10" data-name="Per-page micro-tours"></div></td></tr>
+    <tr><td class="n">11</td><td><b>Empty-state Sprout</b><span class="d">Blank list pages get a mascot card: one sentence + one primary action</span></td><td class="from">UX</td><td><span class="chip M">M</span></td><td class="verdict">One shared component, adopted page by page</td><td><div class="tog" data-key="i11" data-name="Empty-state Sprout"></div></td></tr>
+    <tr><td class="n">12</td><td><b>Notification micro-tours</b><span class="d">Clicking “3 tier reviews waiting” launches the review workflow’s 3 steps</span></td><td class="from">Eng</td><td><span class="chip M">M</span></td><td class="verdict">Merge with #10 into one mission framework</td><td><div class="tog" data-key="i12" data-name="Notification micro-tours"></div></td></tr>
+    <tr><td class="n">13</td><td><b>Accessible wayfinding pass</b><span class="d">aria-live bubbles, focus management, SR-visible spotlight, reduced-motion</span></td><td class="from">UX</td><td><span class="chip S">S</span></td><td class="verdict love">“The license to ship everything else”</td><td><div class="tog" data-key="i13" data-name="Accessible wayfinding pass"></div></td></tr>
+  </table></div>
+
+  <div class="theme">Context awareness</div>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:34px">#</th><th>Idea</th><th>From</th><th style="width:52px">Effort</th><th>Panel verdict</th><th style="width:150px">Decide</th></tr>
+    <tr><td class="n">14<span class="star">★</span></td><td><b>Page-aware answers</b><span class="d">Pathname + safe context into every ask; contextual suggestion chip per page</span></td><td class="from">Eng · UX</td><td><span class="chip S">S</span></td><td class="verdict love">Pathname now; record context needs a server-authorized provider</td><td><div class="tog" data-key="i14" data-name="Page-aware answers"></div></td></tr>
+    <tr><td class="n">15<span class="star">★</span></td><td><b>Summarize this page</b><span class="d">“Here’s what’s on Workload right now” — live data narrated, any role</span></td><td class="from">Ops · New&nbsp;VA</td><td><span class="chip M">M</span></td><td class="verdict">Needs authorized route-specific queries, not “reuse the page’s fetch”</td><td><div class="tog" data-key="i15" data-name="Summarize this page"></div></td></tr>
+    <tr><td class="n">16<span class="star">★</span></td><td><b>Thread memory</b><span class="d">“What about the second one?” works — last 4–6 turns sent with each ask</span></td><td class="from">Eng · AI</td><td><span class="chip S">S</span></td><td class="verdict">Start ephemeral + bounded; persistence only if usage proves it</td><td><div class="tog" data-key="i16" data-name="Thread memory"></div></td></tr>
+    <tr><td class="n">17</td><td><b>Sprout knows you</b><span class="d">Per-user context: your pending reviews, your flagged VAs — folded into the prompt</span></td><td class="from">AI</td><td><span class="chip M">M</span></td><td class="verdict">Define “mine” per domain first; counts are mostly global today</td><td><div class="tog" data-key="i17" data-name="Sprout knows you (per-user context)"></div></td></tr>
+    <tr><td class="n">18</td><td><b>Live console grounding</b><span class="d">Answers from a generated capability index instead of the 300-line hand-written prompt</span></td><td class="from">AI</td><td><span class="chip M">M</span></td><td class="verdict">Build-time curated manifest, not runtime source-code retrieval</td><td><div class="tog" data-key="i18" data-name="Live console grounding"></div></td></tr>
+  </table></div>
+
+  <div class="theme">Doing, not telling</div>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:34px">#</th><th>Idea</th><th>From</th><th style="width:52px">Effort</th><th>Panel verdict</th><th style="width:150px">Decide</th></tr>
+    <tr><td class="n">19<span class="star">★</span></td><td><b>Role-scoped Sprout Actions</b><span class="d">Graduate hidden Bypass propose→confirm→audit into a per-role feature</span></td><td class="from">Eng · AI</td><td><span class="chip L">L</span></td><td class="verdict warn">Needs actor-bound proposal tokens; execute endpoint trusts the client today</td><td><div class="tog" data-key="i19" data-name="Role-scoped Sprout Actions"></div></td></tr>
+    <tr><td class="n">20<span class="star">★</span></td><td><b>Delegation drafting</b><span class="d">Plain English → pre-filled Delegate Task form (least-busy assignee suggested)</span></td><td class="from">Ops</td><td><span class="chip M">M</span></td><td class="verdict love">“Prefill the real form” is the right interaction</td><td><div class="tog" data-key="i20" data-name="Delegation drafting"></div></td></tr>
+    <tr><td class="n">21</td><td><b>Clear-the-queue batches</b><span class="d">“Approve all 6 straightforward tier reviews” — one checklist confirm</span></td><td class="from">Ops · AI</td><td><span class="chip L">L</span></td><td class="verdict warn">Ship as draft checklist first; batch writes weaken the confirm-step safety</td><td><div class="tog" data-key="i21" data-name="Clear-the-queue batches"></div></td></tr>
+    <tr><td class="n">22<span class="star">★</span></td><td><b>Close the loop</b><span class="d">After a confirmed action: result summary, refreshed badges, “Open result” link</span></td><td class="from">Eng</td><td><span class="chip M">M</span></td><td class="verdict love">Genuine quick win; do before broader agentic access</td><td><div class="tog" data-key="i22" data-name="Close the loop"></div></td></tr>
+    <tr><td class="n">23</td><td><b>“My focus” live cards</b><span class="d">Read-only previews: my open tasks, review counts, payroll state — no Q&amp;A needed</span></td><td class="from">Eng</td><td><span class="chip M">M</span></td><td class="verdict">Current list tools run as fabricated HR context — rescope to the caller first</td><td><div class="tog" data-key="i23" data-name="My-focus live cards"></div></td></tr>
+    <tr><td class="n">24</td><td><b>Remind me</b><span class="d">“Remind me about Jules’s contract in 3 days” — said in chat, surfaces in the briefing</span></td><td class="from">Ops</td><td><span class="chip S">S</span></td><td class="verdict">Own small table; don’t reuse the shared sales follow-up queue</td><td><div class="tog" data-key="i24" data-name="Remind me"></div></td></tr>
+    <tr><td class="n">25</td><td><b>Client-request triage assist</b><span class="d">New request → suggested assignee + drafted task description inline on the row</span></td><td class="from">Ops</td><td><span class="chip M">M</span></td><td class="verdict">Only explain signals the ranking actually uses (no fake “skills match”)</td><td><div class="tog" data-key="i25" data-name="Client-request triage assist"></div></td></tr>
+  </table></div>
+
+  <div class="theme">Coaching &amp; onboarding</div>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:34px">#</th><th>Idea</th><th>From</th><th style="width:52px">Effort</th><th>Panel verdict</th><th style="width:150px">Decide</th></tr>
+    <tr><td class="n">26<span class="star">★</span></td><td><b>Get Set Up checklist</b><span class="d">Done-aware, resumable week-1 companion; progress ring on the mascot</span></td><td class="from">New&nbsp;VA · UX · Growth</td><td><span class="chip M">M</span></td><td class="verdict love">Derive from real events; tie to onboarding state, not fixed days</td><td><div class="tog" data-key="i26" data-name="Get Set Up checklist"></div></td></tr>
+    <tr><td class="n">27</td><td><b>Tier-path encourager</b><span class="d">The hours bar narrated as progress toward eligibility, warmly</span></td><td class="from">New&nbsp;VA</td><td><span class="chip M">M</span></td><td class="verdict warn">Never predict promotion — eligibility framing only</td><td><div class="tog" data-key="i27" data-name="Tier-path encourager"></div></td></tr>
+    <tr><td class="n">28</td><td><b>Reassurance chips</b><span class="d">Tappable “Is it normal that…” worries answered from HR-approved policy</span></td><td class="from">New&nbsp;VA</td><td><span class="chip S">S</span></td><td class="verdict">Content must be versioned HR policy, not improvised</td><td><div class="tog" data-key="i28" data-name="Reassurance chips"></div></td></tr>
+    <tr><td class="n">29</td><td><b>Taglish tone toggle</b><span class="d">Answers in warm, code-switched Taglish — an explicit remembered preference</span></td><td class="from">New&nbsp;VA</td><td><span class="chip S">S</span></td><td class="verdict">Opt-in toggle, never auto-detected</td><td><div class="tog" data-key="i29" data-name="Taglish tone toggle"></div></td></tr>
+  </table></div>
+
+  <div class="theme">Learning loop &amp; escape hatches</div>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:34px">#</th><th>Idea</th><th>From</th><th style="width:52px">Effort</th><th>Panel verdict</th><th style="width:150px">Decide</th></tr>
+    <tr><td class="n">30</td><td><b>Feedback loop + UX-debt radar</b><span class="d">👍/👎 on every answer + a weekly queue of what Sprout gets wrong and which screens confuse people</span></td><td class="from">AI · Growth</td><td><span class="chip S">S</span></td><td class="verdict love">The CPO’s #1 — cheapest, compounds into everything else</td><td><div class="tog" data-key="i30" data-name="Feedback loop + UX-debt radar"></div></td></tr>
+  </table></div>
+
+  <p class="lede" style="margin-top:18px; font-size:.88rem">Cut by the panel: voice input (no user evidence yet), live sandbox/practice mode (use the demo dataset instead), and auto multi-step batch execution (drafts first — one confirm per write stays the rule).</p>
+
+  <div class="summary" id="decisions">
+    <h2>Decision summary</h2>
+    <p class="hint">Updates live as you decide. Copy it and paste it back into the Claude chat to kick off implementation.</p>
+    <textarea id="summaryText" readonly aria-label="Decision summary"></textarea>
+    <div class="summary-actions">
+      <button id="copyBtn">Copy summary</button>
+      <button id="resetBtn">Reset all decisions</button>
+      <span id="copyStatus" role="status"></span>
+    </div>
+  </div>
+
+  <div class="method">
+    <b>How this was made.</b> Six persona agents ran in parallel across three model pools — <b>Dex</b> &amp; <b>Priya</b> on Codex, <b>Wren</b> on Antigravity (re-run on Claude after a no-op), <b>Marisol</b>, <b>Jomar</b> &amp; <b>Kade</b> on Claude — each reading the real Sprout source before writing. A seventh pass played skeptical CPO, critiquing all 48 ideas for realism, security, and overlap; its verdicts appear throughout. Full persona docs live in the fan-out worktrees under <code>~/ar-fanout/2026-07-18T00-11-06-475Z/</code>.
+    <div class="personas">
+      <div class="persona"><span class="eng">Codex</span><b>Dex — Staff Engineer</b><span>cheap &amp; high-leverage, grounded in the code</span></div>
+      <div class="persona"><span class="eng">Codex</span><b>Priya — Growth PM</b><span>activation, habit loops, measurement</span></div>
+      <div class="persona"><span class="eng">Antigravity→Claude</span><b>Wren — UX Designer</b><span>lost users, wayfinding, accessibility</span></div>
+      <div class="persona"><span class="eng">Claude</span><b>Marisol — Head of Ops</b><span>the busy operator’s morning</span></div>
+      <div class="persona"><span class="eng">Claude</span><b>Jomar — VA, day 3</b><span>the nervous newcomer</span></div>
+      <div class="persona"><span class="eng">Claude</span><b>Kade — AI Strategist</b><span>agentic frontier, safely</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var STORE_KEY = "sprout_panel_decisions_v1";
+  var CHOICES = [
+    { c: "implement", label: "✓ Implement" },
+    { c: "hold",      label: "◦ Hold" },
+    { c: "reject",    label: "✕ Reject" }
+  ];
+
+  function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { return {}; }
+  }
+  function saveState(s) {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch (e) {}
+  }
+  var state = loadState();
+
+  // Registry of idea metadata, built from the table rows (authoritative names/order).
+  var ideas = [];      // [{key, num, name}]
+  var seen = {};
+  document.querySelectorAll("table .tog[data-key]").forEach(function (tog) {
+    var key = tog.getAttribute("data-key");
+    if (seen[key]) return;
+    seen[key] = true;
+    ideas.push({ key: key, num: parseInt(key.slice(1), 10), name: tog.getAttribute("data-name") || key });
+  });
+  ideas.sort(function (a, b) { return a.num - b.num; });
+
+  // Build the 3 buttons inside every .tog.
+  document.querySelectorAll(".tog[data-key]").forEach(function (tog) {
+    CHOICES.forEach(function (ch) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.textContent = ch.label;
+      b.setAttribute("data-c", ch.c);
+      b.setAttribute("aria-pressed", "false");
+      b.addEventListener("click", function () {
+        var keys = [tog.getAttribute("data-key")];
+        var also = tog.getAttribute("data-also");
+        if (also) keys = keys.concat(also.split(","));
+        var turningOff = state[keys[0]] === ch.c;
+        keys.forEach(function (k) {
+          if (turningOff) delete state[k]; else state[k] = ch.c;
+        });
+        saveState(state);
+        render();
+      });
+      tog.appendChild(b);
+    });
+  });
+
+  function render() {
+    // toggle button states (a bundle tog reflects its primary key)
+    document.querySelectorAll(".tog[data-key]").forEach(function (tog) {
+      var cur = state[tog.getAttribute("data-key")];
+      tog.querySelectorAll("button").forEach(function (b) {
+        b.setAttribute("aria-pressed", b.getAttribute("data-c") === cur ? "true" : "false");
+      });
+    });
+    // row tint
+    document.querySelectorAll("table .tog[data-key]").forEach(function (tog) {
+      var tr = tog.closest("tr");
+      if (!tr) return;
+      tr.className = state[tog.getAttribute("data-key")] ? "st-" + state[tog.getAttribute("data-key")] : "";
+    });
+    // tally
+    var counts = { implement: 0, hold: 0, reject: 0 };
+    ideas.forEach(function (i) { if (state[i.key]) counts[state[i.key]]++; });
+    var und = ideas.length - counts.implement - counts.hold - counts.reject;
+    document.getElementById("cImpl").textContent = counts.implement;
+    document.getElementById("cHold").textContent = counts.hold;
+    document.getElementById("cRej").textContent = counts.reject;
+    document.getElementById("cUnd").textContent = und;
+    // summary text
+    function list(choice) {
+      return ideas.filter(function (i) { return state[i.key] === choice; })
+                  .map(function (i) { return "#" + i.num + " " + i.name; });
+    }
+    var undList = ideas.filter(function (i) { return !state[i.key]; })
+                       .map(function (i) { return "#" + i.num + " " + i.name; });
+    var lines = ["SPROUT PANEL DECISIONS — sprout-beyond-qa (30 ideas)", ""];
+    lines.push("IMPLEMENT (" + counts.implement + "):");
+    lines = lines.concat(list("implement").map(function (s) { return "  " + s; }), [""]);
+    lines.push("HOLD (" + counts.hold + "):");
+    lines = lines.concat(list("hold").map(function (s) { return "  " + s; }), [""]);
+    lines.push("REJECT (" + counts.reject + "):");
+    lines = lines.concat(list("reject").map(function (s) { return "  " + s; }), [""]);
+    lines.push("UNDECIDED (" + und + "):");
+    lines = lines.concat(undList.map(function (s) { return "  " + s; }));
+    document.getElementById("summaryText").value = lines.join("\n");
+  }
+
+  document.getElementById("copyBtn").addEventListener("click", function () {
+    var ta = document.getElementById("summaryText");
+    var done = function () {
+      var st = document.getElementById("copyStatus");
+      st.textContent = "Copied — paste it into the Claude chat.";
+      setTimeout(function () { st.textContent = ""; }, 4000);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); document.execCommand("copy"); done(); });
+    } else { ta.select(); document.execCommand("copy"); done(); }
+  });
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    state = {}; saveState(state); render();
+  });
+
+  render();
+})();
+</script>

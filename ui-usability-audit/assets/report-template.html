@@ -1,0 +1,165 @@
+<!--
+  UI Usability Audit — before/after report template.
+  Paste into mcp__visualize show_widget as `widget_code` and fill the FILL-IN sections.
+  Rules: chrome (scorecard, glossary, headings, legends) = sentence case + host CSS vars.
+  ALL-CAPS only inside .bf (before) frames, where it depicts the real product.
+  Swap the .bf / .af palette to match the audited product. Markers ①②③ + legend annotate "before".
+-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/3.34.0/tabler-icons.min.css">
+<style>
+  .au { padding: 1rem 0; font-family: var(--font-sans); color: var(--color-text-primary); line-height: 1.6; }
+  .au .sr-only { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); }
+  .au h2 { font-size:18px; font-weight:500; margin:0 0 2px; }
+  .au h3 { font-size:16px; font-weight:500; margin:0; }
+  .au .lede { color: var(--color-text-secondary); font-size:14px; margin:0 0 18px; }
+  .au .sec { margin: 26px 0 10px; }
+  .au .cap { font-size:12.5px; color: var(--color-text-secondary); margin:6px 2px 0; }
+  .au .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .au .col { min-width:0; }
+  /* before / after section labels */
+  .au .lbl { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:500; padding:2px 8px; border-radius:999px; margin-bottom:7px; }
+  .au .lbl.now { background: var(--color-background-danger); color: var(--color-text-danger); }
+  .au .lbl.new { background: var(--color-background-success); color: var(--color-text-success); }
+  /* device frame */
+  .au .fr { border-radius:10px; overflow:hidden; border:1px solid var(--color-border-secondary); }
+  .au .topbar { display:flex; align-items:center; gap:6px; padding:6px 9px; }
+  .au .topbar .d { width:7px; height:7px; border-radius:999px; }
+  .au .url { margin-left:6px; padding:2px 8px; border-radius:5px; font-size:9px; opacity:.85; }
+  .au .canvas { padding:11px; position:relative; min-height:120px; }
+  /* BEFORE — faithful to the product (edit palette to match). Example = dark cosmic. */
+  .bf { background:#0a0a0b; color:#e7e9ee; }
+  .bf .topbar { background:#141417; border-bottom:1px solid rgba(255,255,255,.08); }
+  .bf .topbar .d { background:#3a3a40; }
+  .bf .url { background:rgba(255,255,255,.06); color:#9aa; }
+  .bf .caps { text-transform:uppercase; letter-spacing:.22em; }      /* product's real style */
+  .bf .kick { font-size:8px; color:#67e8f9; text-transform:uppercase; letter-spacing:.34em; }
+  .bf .disp { font-weight:700; letter-spacing:-.02em; }
+  .bf .chip { border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.04); padding:4px 7px; font-size:7.5px; text-transform:uppercase; letter-spacing:.2em; color:#aab; }
+  .bf .panel { border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.035); padding:8px; }
+  .bf .mono { font-family:var(--font-mono); font-weight:700; }
+  .bf .cy{color:#67e8f9;} .bf .am{color:#fcd34d;} .bf .te{color:#5eead4;} .bf .red{color:#f87171;}
+  .bf .star{ position:absolute; width:2px;height:2px;background:#fff;border-radius:999px;opacity:.5;}
+  /* AFTER — same family, calmed: sentence case, one accent, signal chips. */
+  .af { background:#11161f; color:#e9edf3; }
+  .af .topbar { background:#1a2130; border-bottom:1px solid rgba(255,255,255,.08); }
+  .af .topbar .d { background:#46506a; }
+  .af .url { background:rgba(255,255,255,.07); color:#9fb0c9; }
+  .af .nav { display:flex; gap:3px; flex-wrap:wrap; align-items:center; }
+  .af .navit { font-size:9.5px; padding:4px 8px; border-radius:6px; color:#aebbcf; }
+  .af .navit.on { background:#5eead4; color:#06302a; font-weight:500; }
+  .af .sub { color:#9fb0c9; }
+  .af .card { background:#1a2130; border:1px solid rgba(255,255,255,.09); border-radius:8px; padding:9px; }
+  .af .pill { display:inline-flex; align-items:center; gap:4px; font-size:9px; padding:2px 7px; border-radius:999px; }
+  .af .good { background:rgba(134,239,172,.16); color:#86efac; }     /* good / on-track */
+  .af .warn { background:rgba(252,211,77,.16); color:#fcd34d; }      /* watch */
+  .af .neu  { background:rgba(159,176,201,.16); color:#bcc8db; }     /* neutral */
+  .af .btn { display:inline-flex; align-items:center; gap:5px; font-size:9.5px; font-weight:500; padding:5px 10px; border-radius:6px; background:#5eead4; color:#06302a; }
+  .af .btn.ghost { background:transparent; border:1px solid rgba(255,255,255,.18); color:#cdd8e8; }
+  .af .sel { font-size:9px; padding:3px 7px; border-radius:5px; border:1px solid rgba(255,255,255,.18); color:#cdd8e8; }
+  /* markers + legend (annotate the "before" frames) */
+  .au .mk { display:inline-flex; align-items:center; justify-content:center; width:15px;height:15px; border-radius:999px; background:#ef4444; color:#fff; font-size:9px; font-weight:500; vertical-align:middle;}
+  .au .leg { margin-top:7px; display:grid; gap:3px; }
+  .au .leg div { font-size:12px; color:var(--color-text-secondary); display:flex; gap:7px; align-items:flex-start; }
+  /* scorecard */
+  .au .scards { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+  .au .scard { border:1px solid var(--color-border-tertiary); border-radius:12px; padding:12px; }
+  .au .scard .gr { font-size:26px; font-weight:500; line-height:1; }
+  .au .scard .nm { font-size:13px; font-weight:500; margin:2px 0 6px; }
+  .au .scard .ds { font-size:12px; color:var(--color-text-secondary); }
+  /* tab-row comparison (nav) */
+  .au .tabrow { display:flex; flex-wrap:wrap; gap:4px; }
+  .au .tb { font-size:9px; padding:4px 7px; border-radius:5px; border:1px solid var(--color-border-tertiary); color:var(--color-text-secondary); }
+  .au .tb.caps { text-transform:uppercase; letter-spacing:.14em; }
+  .au .tb.on { background:#5eead4; color:#06302a; border-color:transparent; font-weight:500; }
+  /* glossary */
+  .au table { width:100%; border-collapse:collapse; font-size:13px; }
+  .au th { text-align:left; font-weight:500; font-size:11px; color:var(--color-text-tertiary); padding:5px 8px; border-bottom:1px solid var(--color-border-tertiary); }
+  .au td { padding:6px 8px; border-bottom:1px solid var(--color-border-tertiary); vertical-align:top; }
+  .au td.was { color:var(--color-text-secondary); }
+  .au td.was code { background:var(--color-background-secondary); padding:1px 5px; border-radius:4px; font-size:12px; }
+  .au td.is { font-weight:500; }
+  /* recommendations */
+  .au .recos { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .au .recobox { border:1px solid var(--color-border-tertiary); border-radius:12px; padding:12px; }
+  .au .recobox .ttl { font-size:13px; font-weight:500; display:flex; align-items:center; gap:6px; margin-bottom:9px; }
+  .au .ritem { font-size:13px; display:flex; gap:8px; padding:5px 0; border-top:1px solid var(--color-border-tertiary); }
+  .au .ritem:first-of-type{ border-top:none; }
+  .au .ritem i { color:var(--color-text-tertiary); margin-top:2px; }
+  @media (max-width:560px){ .au .grid2,.au .recos,.au .scards{grid-template-columns:1fr;} }
+</style>
+
+<div class="au">
+  <h2 class="sr-only">FILL: one-sentence summary of the audit for screen readers.</h2>
+
+  <h2>FILL: [App] — [user] usability</h2>
+  <p class="lede">FILL: one-line thesis (what's strong, what gets in the user's way).</p>
+
+  <!-- 1 · SCORECARD -->
+  <div class="sec"><span style="font-size:12px;color:var(--color-text-tertiary)">How it scores today</span></div>
+  <div class="scards">
+    <div class="scard"><div class="gr" style="color:var(--color-text-warning)">C&minus;</div><div class="nm">Intuitive learning</div><div class="ds">FILL: the one core problem.</div></div>
+    <div class="scard"><div class="gr" style="color:var(--color-text-warning)">C</div><div class="nm">Navigability</div><div class="ds">FILL: the one core problem.</div></div>
+    <div class="scard"><div class="gr" style="color:var(--color-text-success)">B&minus;</div><div class="nm">Usefulness</div><div class="ds">FILL: the one core problem.</div></div>
+  </div>
+
+  <!-- 2 · BEFORE → AFTER pair (duplicate this block per key screen: front door, a read screen, the core action) -->
+  <div class="sec"><h3>1 · FILL: screen name (e.g., the front door)</h3></div>
+  <div class="grid2">
+    <div class="col">
+      <span class="lbl now"><i class="ti ti-alert-triangle"></i>Now</span>
+      <div class="fr bf">
+        <div class="topbar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">FILL: /route</span></div>
+        <div class="canvas">
+          <!-- FILL: faithful mock of the real screen (real labels/colors/caps). Add <span class="mk">1</span> markers. -->
+        </div>
+      </div>
+      <div class="leg">
+        <div><span class="mk">1</span> FILL: what's wrong here, in the user's terms.</div>
+      </div>
+    </div>
+    <div class="col">
+      <span class="lbl new"><i class="ti ti-sparkles"></i>Clearer</span>
+      <div class="fr af">
+        <div class="topbar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="url">FILL: /route</span></div>
+        <div class="canvas">
+          <!-- FILL: same screen, calmed — sentence case, plain labels, signal chips (.good/.warn/.neu), close-the-loop. -->
+        </div>
+      </div>
+      <div class="leg"><div><i class="ti ti-check" style="color:var(--color-text-success)"></i> FILL: the fix in one line.</div></div>
+    </div>
+  </div>
+
+  <!-- (optional) nav comparison as two tab-rows -->
+  <!--
+  <div class="sec"><h3>2 · Moving around</h3></div>
+  <div style="margin-bottom:9px"><span class="lbl now">Now</span>
+    <div class="tabrow"><span class="tb caps on">Tab</span><span class="tb caps">Tab</span>…</div>
+    <div class="cap">FILL: why this nav is hard.</div></div>
+  <div><span class="lbl new">Clearer</span>
+    <div class="tabrow"><span class="tb on">Group</span><span class="tb">Group</span>…</div>
+    <div class="cap">FILL: why this nav is easier.</div></div>
+  -->
+
+  <!-- 3 · GLOSSARY -->
+  <div class="sec"><h3>FILL: Say it the way a [user] would</h3></div>
+  <table>
+    <thead><tr><th style="width:50%">What it says now</th><th>What a [user] reads easily</th></tr></thead>
+    <tbody>
+      <tr><td class="was"><code>FILL term</code></td><td class="is">FILL plain words</td></tr>
+      <!-- repeat rows -->
+    </tbody>
+  </table>
+
+  <!-- 4 · RECOMMENDATIONS -->
+  <div class="sec"><h3>Where to start</h3></div>
+  <div class="recos">
+    <div class="recobox">
+      <div class="ttl"><i class="ti ti-bolt" style="color:var(--color-text-warning)"></i> Quick wins (copy &amp; layout)</div>
+      <div class="ritem"><i class="ti ti-language"></i> FILL.</div>
+    </div>
+    <div class="recobox">
+      <div class="ttl"><i class="ti ti-target-arrow" style="color:var(--color-text-info)"></i> Bigger bets (structure)</div>
+      <div class="ritem"><i class="ti ti-layout-grid"></i> FILL.</div>
+    </div>
+  </div>
+</div>

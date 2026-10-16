@@ -1,0 +1,466 @@
+<!doctype html>
+<!--
+  STORYBOARD — the approval gate before a deck is built.
+  Copy this file next to the future deck, replace the BOARD spec between the
+  SPEC:START / SPEC:END markers, open it, let the user verdict each card.
+  Wireframes are deliberately gray; art drafts (schnell) and live FX thumbnails
+  are the only things shown for real, because those are what text can't carry.
+  Verdicts persist in localStorage; "Copy feedback" returns markdown to chat.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Storyboard</title>
+<style>
+*{box-sizing:border-box}
+:root{
+  --bg:#101318;--panel:#171C24;--panel-2:#1E2530;--ink:#EDF0F5;--ink-2:#9AA3B2;
+  --ink-3:#5F6875;--rule:#262E3A;--accent:#3987E5;--warm:#D95926;--good:#199E70;
+  --wire:#39424F;--wire-2:#2A323D;
+}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;padding:34px 40px 120px}
+header{max-width:1180px;margin:0 auto 26px}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.01em}
+.sub{color:var(--ink-2);font-size:14px;max-width:88ch}
+.sub b{color:var(--ink)}
+.meta{display:flex;gap:22px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--ink-3);
+  font-family:ui-monospace,Menlo,monospace}
+.meta span b{color:var(--ink-2);font-weight:600}
+#grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(2,1fr);gap:20px}
+@media(max-width:900px){#grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--rule);border-radius:14px;overflow:hidden;
+  transition:outline-color .15s;outline:2px solid transparent}
+.card[data-verdict="keep"]{outline-color:var(--good)}
+.card[data-verdict="change"]{outline-color:var(--warm)}
+.card[data-verdict="cut"]{outline-color:#E34948;opacity:.55}
+/* ---------- thumbnail ---------- */
+.thumb{aspect-ratio:16/9;position:relative;background:#0C0F14;overflow:hidden;cursor:pointer}
+.thumb.light{background:#F7F5F0}
+.thumb .art{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.85}
+.thumb .scrim{position:absolute;inset:0;background:linear-gradient(100deg,rgba(12,15,20,.92) 30%,rgba(12,15,20,.25) 70%,transparent)}
+.thumb.light .scrim{background:linear-gradient(100deg,rgba(247,245,240,.94) 30%,rgba(247,245,240,.3) 70%,transparent)}
+.wf{position:absolute;inset:0;padding:7.5% 8%;display:flex;flex-direction:column;gap:2.5%}
+/* wireframe atoms — gray on dark, darker gray on light */
+.b{background:var(--wire);border-radius:3px}
+.thumb.light .b{background:#C9C4B8}
+.b.dim{background:var(--wire-2)} .thumb.light .b.dim{background:#DEDACF}
+.b.acc{background:var(--accent);opacity:.75}
+.hl{font-weight:800;color:#DDE3EC;letter-spacing:-.02em;line-height:1.05}
+.thumb.light .hl{color:#2A2A33}
+.fxc{position:absolute;inset:0;pointer-events:none}
+.fxc.over{mix-blend-mode:screen;opacity:.55}
+.replay{position:absolute;right:9px;top:9px;z-index:5;font-size:10.5px;letter-spacing:.08em;
+  color:#fff;background:rgba(0,0,0,.45);padding:3px 9px;border-radius:99px;
+  font-family:ui-monospace,monospace;opacity:0;transition:opacity .15s}
+.thumb:hover .replay{opacity:1}
+/* ---------- body ---------- */
+.card .body{padding:15px 18px 16px}
+.tag{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:10.5px;
+  letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:99px;
+  border:1px solid var(--rule);color:var(--ink-2);margin:0 5px 6px 0}
+.tag.fx{border-color:rgba(217,89,38,.5);color:#F0A281}
+.tag.art{border-color:rgba(57,135,229,.5);color:#87B6ED}
+.card h3{margin:4px 0 2px;font-size:16.5px}
+.card h3 i{font-style:normal;color:var(--ink-3);font-weight:500;font-size:13px;margin-right:8px;
+  font-family:ui-monospace,monospace}
+.words{color:var(--ink-2);font-size:13.5px;margin:2px 0 8px}
+.why{font-size:13px;color:var(--ink-3);border-left:2px solid var(--rule);padding-left:10px;margin:8px 0 0}
+.why b{color:var(--ink-2);font-weight:600}
+/* ---------- speaker note: collapsed so 30 cards stay scannable ---------- */
+.note{margin:10px 0 0;border-top:1px solid var(--rule);padding-top:9px}
+.note summary{cursor:pointer;list-style:none;display:flex;gap:8px;align-items:baseline;
+  font-size:12.5px;color:var(--ink-2)}
+.note summary::-webkit-details-marker{display:none}
+.note summary::before{content:"▸";color:var(--ink-3);font-size:11px;transition:transform .15s}
+.note[open] summary::before{transform:rotate(90deg)}
+.note summary b{color:var(--ink-2);font-weight:600}
+.note .wc{margin-left:auto;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:var(--ink-3)}
+.note .wc.chg{color:var(--warm)}
+.note textarea{width:100%;min-height:132px;resize:vertical;margin-top:8px;
+  font:inherit;font-size:13.5px;line-height:1.6;background:var(--bg);color:var(--ink);
+  border:1px solid var(--rule);border-radius:8px;padding:11px 13px}
+.note textarea:focus{outline:2px solid var(--accent);border-color:transparent}
+.note .nh{font-size:11.5px;color:var(--ink-3);margin:6px 0 0}
+.note.none summary{color:var(--warm)}
+.artline{font-size:12.5px;color:var(--ink-3);margin-top:8px;font-family:ui-monospace,Menlo,monospace}
+/* stock candidates — pick the actual photo at storyboard time, not after the build */
+.cands{display:flex;gap:7px;margin-top:10px}
+.cands figure{margin:0;flex:1;cursor:pointer;border:2px solid transparent;border-radius:6px;
+  overflow:hidden;position:relative;transition:border-color .12s}
+.cands figure:hover{border-color:var(--ink-3)}
+.cands figure.chosen{border-color:var(--accent)}
+.cands img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}
+.cands figcaption{position:absolute;left:0;bottom:0;right:0;font-size:9.5px;padding:2px 4px;
+  background:rgba(0,0,0,.6);color:#fff;font-family:ui-monospace,monospace;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cands figure.chosen figcaption{background:var(--accent)}
+/* ---------- verdict row ---------- */
+.verdict{display:flex;gap:8px;align-items:center;padding:12px 18px 14px;border-top:1px solid var(--rule)}
+.verdict button{font:inherit;font-size:12.5px;padding:6px 13px;border-radius:8px;cursor:pointer;
+  border:1px solid var(--rule);background:var(--panel-2);color:var(--ink-2)}
+.verdict button:hover{color:var(--ink)}
+.verdict button.on-keep{background:rgba(25,158,112,.18);border-color:var(--good);color:#7BDCB6}
+.verdict button.on-change{background:rgba(217,89,38,.16);border-color:var(--warm);color:#F0A281}
+.verdict button.on-cut{background:rgba(227,73,72,.14);border-color:#E34948;color:#F09C9C}
+.verdict input{flex:1;font:inherit;font-size:13px;background:var(--bg);color:var(--ink);
+  border:1px solid var(--rule);border-radius:8px;padding:7px 11px;min-width:0}
+.verdict input::placeholder{color:var(--ink-3)}
+/* ---------- footer bar ---------- */
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:14px;align-items:center;
+  padding:14px 40px;background:rgba(12,15,20,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--rule);z-index:10}
+#tally{font-size:13.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+#deckNote{flex:1;font:inherit;font-size:13.5px;background:var(--panel);color:var(--ink);
+  border:1px solid var(--rule);border-radius:9px;padding:9px 13px}
+#copy{font:inherit;font-size:14px;font-weight:600;padding:10px 22px;border-radius:9px;
+  border:0;background:var(--accent);color:#fff;cursor:pointer}
+#copy:hover{filter:brightness(1.1)}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hTitle"></h1>
+  <p class="sub" id="hSub"></p>
+  <div class="meta" id="hMeta"></div>
+</header>
+<div id="grid"></div>
+<div id="bar">
+  <span id="tally"></span>
+  <button id="allNotes" style="font:inherit;font-size:13px;padding:9px 15px;border-radius:9px;
+    border:1px solid var(--rule);background:var(--panel-2);color:var(--ink-2);cursor:pointer">Read all notes</button>
+  <input id="deckNote" placeholder="Deck-level notes — order, missing slides, overall direction…">
+  <button id="copy">Copy feedback for Claude</button>
+</div>
+
+<script>
+/* ================================ SPEC:START ================================
+   One entry per planned slide.
+   format: cover|section|statement|two-column|stat-grid|bullets|steps|compare|
+           table|timeline|chart|quote|code|grid4|closing
+   fx:      ember|aurora|mesh|motes|spot   (+ fxOver:true to blend over)
+   fxText:  particles|mask|elastic         (headline treatment, shown live)
+   chart:   bar|stacked|line|donut         (chart wireframe variant)
+   art:     generated → {src, prompt, treatment, tier:"schnell draft"}
+            stock     → {source:"pexels", treatment, candidates:[{src,id,photographer,alt}]}
+                        (candidates render as a clickable strip; the pick is exported)
+   why:     one line of reasoning the user can disagree with
+   note:    the SPEAKER NOTE — what the presenter would actually say out loud on this
+            slide, written to be spoken. Shown collapsed on the card, editable,
+            and returned by "Copy feedback". Write it BEFORE the on-slide words:
+            the note is the talk and the slide is a caption for it, so drafting
+            the note is what tells you what the slide has to show. Blank lines
+            separate paragraphs. Every card should have one.                  */
+const BOARD = {
+  deck: "Demo storyboard",
+  direction: "Replace this spec with the real deck's plan.",
+  theme: "dark", fx: "max", trans: "zoom",
+  art: "0 drafts",
+  slides: [
+    { n:1, format:"cover", title:"Cover", head:"The Deck Title",
+      words:"One line that says why this matters.", fx:"ember", fxText:"particles",
+      why:"Demo card — swap the whole BOARD object.",
+      note:"What you'd say standing in front of this slide, in your own voice.\n\nSecond paragraph if the thought needs one. Open the disclosure on the card to edit it." },
+  ],
+};
+/* ================================ SPEC:END ================================ */
+
+/* ---------- wireframe renderer: gray boxes per format ---------- */
+const el=(t,c,st)=>{const d=document.createElement(t);if(c)d.className=c;if(st)d.style.cssText=st;return d};
+const bar=(w,h,cls)=>el('div','b '+(cls||''),`width:${w};height:${h}`);
+function wire(s,scale,artSrc){
+  const w=el('div','wf');const f=s.format;
+  const HL=(txt,size)=>{const h=el('div','hl');h.style.fontSize=size+'px';h.textContent=txt;
+    if(s.fxText)h.dataset.fxText=s.fxText;return h};
+  const cards=(n,inner)=>{const r=el('div','',`flex:1;display:grid;grid-template-columns:repeat(${n===4?2:n},1fr);gap:4%;align-content:center`);
+    for(let i=0;i<n;i++){const c=el('div','',
+      'background:rgba(255,255,255,.05);border:1px solid var(--wire-2);border-radius:5px;padding:6% 7%;display:flex;flex-direction:column;gap:9%;justify-content:center;min-height:0');
+      inner(c,i);r.append(c)}return r};
+  const spacer=()=>el('div','',`flex:1`);
+  if(f==='cover'||f==='closing'){
+    w.append(spacer(),bar('34%','4px','acc'),HL(s.head,scale*30),bar('52%','5px','dim'),
+      el('div','',`display:flex;gap:3%;margin-top:2%`));
+    const m=w.lastChild;for(let i=0;i<3;i++)m.append(bar('16%','4px','dim'));
+  } else if(f==='section'){
+    w.style.background='var(--accent)';w.style.opacity='.85';
+    w.append(spacer(),bar('20%','4px'),HL(s.head,scale*26),spacer());
+    w.querySelector('.hl').style.color='#fff';
+  } else if(f==='statement'){
+    w.append(spacer(),bar('26%','4px','acc'),HL(s.head,scale*26),bar('46%','5px','dim'),spacer());
+  } else if(f==='two-column'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),
+      el('div','',`flex:1;display:grid;grid-template-columns:1.2fr 1fr;gap:5%;align-items:center;margin-top:2%`));
+    const g=w.lastChild,l=el('div','',`display:flex;flex-direction:column;gap:7%`);
+    for(const p of['92%','78%','84%','40%'])l.append(bar(p,'4.5px','dim'));
+    const img=el('div','',`aspect-ratio:4/3;border-radius:6px;background:${artSrc?`url(${artSrc}) center/cover`:'var(--wire-2)'};border:1px solid var(--wire)`);
+    img.dataset.artzone='1';
+    g.append(l,img);
+  } else if(f==='stat-grid'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),cards(3,c=>{
+      c.append(bar('55%','16%','acc'),bar('70%','5px','dim'),bar('90%','4px','dim'))}));
+  } else if(f==='grid4'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),cards(4,c=>{
+      c.append(bar('50%','8px'),bar('88%','4px','dim'))}));
+  } else if(f==='bullets'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),el('div','',`flex:1;display:flex;flex-direction:column;gap:6%;justify-content:center;margin-top:2%`));
+    const l=w.lastChild;for(let i=0;i<4;i++){const r=el('div','',`display:flex;gap:2.5%;align-items:center`);
+      r.append(bar('3.5%','9px','acc'),bar((62-i*7)+'%','5px'));l.append(r)}
+  } else if(f==='steps'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),cards(3,(c,i)=>{
+      const dot=el('div','',`width:16%;aspect-ratio:1;border-radius:50%;background:var(--accent);opacity:.8`);
+      c.append(dot,bar('60%','7px'),bar('90%','4px','dim'))}));
+  } else if(f==='compare'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),cards(2,(c,i)=>{
+      if(i===1)c.style.background='rgba(57,135,229,.12)';
+      c.append(bar('45%','8px'));for(let j=0;j<3;j++)c.append(bar('85%','4px','dim'))}));
+  } else if(f==='table'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),el('div','',`flex:1;display:flex;flex-direction:column;gap:5%;justify-content:center;margin-top:2%`));
+    const t=w.lastChild;t.append(bar('100%','5px','acc'));
+    for(let i=0;i<3;i++)t.append(bar('100%','7px','dim'));
+  } else if(f==='timeline'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),el('div','',`flex:1;position:relative;margin-top:6%`));
+    const t=w.lastChild;t.append(el('div','',`position:absolute;top:22%;left:0;right:0;height:2px;background:var(--wire)`));
+    for(let i=0;i<4;i++){const n=el('div','',`position:absolute;left:${i*26}%;top:0;width:22%`);
+      n.append(el('div','',`width:9px;height:9px;border-radius:50%;background:var(--accent);margin-bottom:26%`),
+        bar('70%','6px'),el('div','',`height:4%`),bar('95%','4px','dim'));t.append(n)}
+  } else if(f==='chart'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),el('div','',`flex:1;position:relative;margin-top:3%`));
+    const c=w.lastChild;
+    if(s.chart==='donut'){const d=el('div','',
+      `position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:38%;aspect-ratio:1;border-radius:50%;`+
+      `background:conic-gradient(var(--accent) 0 59%,var(--warm) 59% 86%,var(--good) 86%);`+
+      `-webkit-mask:radial-gradient(circle,transparent 55%,#000 56%);mask:radial-gradient(circle,transparent 55%,#000 56%)`);c.append(d)}
+    else if(s.chart==='line'){const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      svg.setAttribute('viewBox','0 0 100 46');svg.style.cssText='position:absolute;inset:0;width:100%;height:100%';
+      svg.innerHTML='<polyline points="4,40 30,32 58,18 96,6" fill="none" stroke="var(--accent)" stroke-width="2.4"/>'+
+        '<polyline points="4,43 30,38 58,28 96,15" fill="none" stroke="var(--warm)" stroke-width="2.4"/>';c.append(svg)}
+    else{const hs=s.chart==='stacked'?[[26,10,8],[52,20,16]]:[[62],[28],[44],[36]];
+      hs.forEach((seg,i)=>{const x=8+i*(84/hs.length);let y=0;
+        seg.forEach((h,j)=>{c.append(el('div','',`position:absolute;bottom:${y}%;left:${x}%;width:${60/hs.length}%;height:${h}%;`+
+          `background:${['var(--accent)','var(--warm)','var(--good)'][j]};border-radius:2px;opacity:.85`));y+=h+1})})}
+  } else if(f==='quote'){
+    w.append(spacer(),HL('“'+s.head+'”',scale*17),el('div','',`display:flex;gap:3%;align-items:center;margin-top:3%`),spacer());
+    const b=w.children[2];b.append(el('div','',`width:7%;aspect-ratio:1;border-radius:50%;background:var(--wire)`),bar('26%','5px','dim'));
+  } else if(f==='code'){
+    w.append(bar('30%','4px','acc'),HL(s.head,scale*15),
+      el('div','',`flex:1;background:rgba(255,255,255,.04);border:1px solid var(--wire-2);border-radius:6px;margin-top:3%;padding:4% 5%;display:flex;flex-direction:column;gap:8%`));
+    const c=w.lastChild;for(const p of['55%','78%','40%'])c.append(bar(p,'5px','dim'));
+  }
+  return w;
+}
+
+/* ---------- live FX at thumbnail scale (compact port of effects.html) ---------- */
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const FRAG=`precision highp float;uniform vec2 R;uniform float T;uniform int M;uniform vec3 A,B,C;
+float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<6;i++){v+=a*n(p);p*=2.03;a*=.5;}return v;}
+void main(){vec2 uv=gl_FragCoord.xy/R.xy;vec2 q=uv;float t=T*.06;float m;
+if(M==0){q.y-=t*2.2;q.x+=sin(uv.y*3.+T*.15)*.06;m=fbm(q*vec2(3.,2.)+fbm(q*5.)*.5);m*=pow(1.-uv.y,1.5)*1.9;m=smoothstep(.18,1.05,m);}
+else if(M==1){q.x+=t*.5;float b=fbm(vec2(q.x*2.2,q.y*1.1+t));m=smoothstep(.35,.95,1.-abs(uv.y-.45-b*.35)*3.2);}
+else{vec2 a=vec2(fbm(q*1.6+t),fbm(q*1.6+t+3.1));m=fbm(q*2.1+a*1.4);m=smoothstep(.25,.9,m);}
+vec3 col=mix(A,B,clamp(m,0.,1.));col=mix(col,C,clamp(m*m*1.15,0.,1.));gl_FragColor=vec4(col,clamp(m*1.05,0.,1.));}`;
+const PAL={ember:[[.22,.53,.9],[.85,.35,.15],[1,.85,.63]],aurora:[[.22,.53,.9],[.85,.35,.15],[.1,.62,.44]],
+  mesh:[[.22,.53,.9],[.85,.35,.15],[.85,.35,.15]]};
+function mountFX(host,kind,over){
+  if(kind==='spot'){host.append(el('div','fxc','','')),host.lastChild.style.cssText=
+    'position:absolute;inset:0;background:radial-gradient(60% 55% at 70% 42%,rgba(57,135,229,.3),transparent 70%)';return}
+  const c=el('canvas','fxc'+(over?' over':''));host.append(c);
+  const r=host.getBoundingClientRect();c.width=Math.max(160,r.width|0);c.height=Math.max(90,r.height|0);
+  c.style.cssText+=';width:100%;height:100%';
+  if(kind==='motes'){const x=c.getContext('2d');
+    const P=Array.from({length:28},()=>({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.8+.5,s:Math.random()*.22+.05,o:Math.random()*.5+.2}));
+    (function loop(){x.clearRect(0,0,c.width,c.height);
+      for(const q of P){if(!reduce){q.y-=q.s;if(q.y<-4){q.y=c.height+4;q.x=Math.random()*c.width}}
+        x.globalAlpha=q.o;x.fillStyle='#3987E5';x.beginPath();x.arc(q.x,q.y,q.r,0,7);x.fill()}
+      if(!reduce)requestAnimationFrame(loop)})();return}
+  const gl=c.getContext('webgl',{alpha:true,premultipliedAlpha:false});if(!gl)return;
+  const sh=(t,src)=>{const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);return o};
+  const pr=gl.createProgram();
+  gl.attachShader(pr,sh(gl.VERTEX_SHADER,'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}'));
+  gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,FRAG));gl.linkProgram(pr);gl.useProgram(pr);
+  const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+  const p=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(p);gl.vertexAttribPointer(p,2,gl.FLOAT,false,0,0);
+  gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+  const U=x=>gl.getUniformLocation(pr,x);const pal=PAL[kind]||PAL.mesh;
+  gl.uniform3fv(U('A'),pal[0]);gl.uniform3fv(U('B'),pal[1]);gl.uniform3fv(U('C'),pal[2]);
+  gl.uniform1i(U('M'),kind==='ember'?0:kind==='aurora'?1:2);
+  gl.viewport(0,0,c.width,c.height);gl.uniform2f(U('R'),c.width,c.height);
+  const t0=performance.now();
+  (function loop(){gl.uniform1f(U('T'),reduce?6:(performance.now()-t0)/1000);
+    gl.drawArrays(gl.TRIANGLES,0,3);if(!reduce)requestAnimationFrame(loop)})();
+}
+/* headline treatments, small scale */
+function treatHeadline(h){
+  const kind=h.dataset.fxText;if(!kind)return;
+  if(kind==='mask'){h.style.cssText+=';background:linear-gradient(100deg,#3987E5,#D95926 50%,#199E70);'+
+    '-webkit-background-clip:text;background-clip:text;color:transparent;background-size:280% 100%;'+
+    'animation:sbm 7s linear infinite';injectKF();return}
+  const txt=h.textContent;h.textContent='';
+  [...txt].forEach((ch,i)=>{const s=el('span');s.textContent=ch;
+    s.style.cssText=`display:inline-block;white-space:pre;opacity:0;`+
+      (kind==='elastic'
+        ?`transform:translateY(10px) scaleY(1.6);animation:sbe .8s cubic-bezier(.2,1.5,.35,1) ${i*28+120}ms forwards`
+        :`animation:sbp .45s ease ${i*22+Math.random()*260}ms forwards`);
+    h.append(s)});
+  injectKF();
+}
+let kfDone=false;
+function injectKF(){if(kfDone)return;kfDone=true;
+  const st=el('style');st.textContent='@keyframes sbe{to{opacity:1;transform:none}}'+
+   '@keyframes sbp{from{opacity:0;transform:translate(0,14px) scale(.4)}to{opacity:1;transform:none}}'+
+   '@keyframes sbm{to{background-position:280% 0}}';document.head.append(st)}
+
+/* ---------- build the page ---------- */
+const KEY='storyboard:'+(BOARD.deck||'deck');
+let V=JSON.parse(localStorage.getItem(KEY)||'{}');   // {n:{verdict,note},deckNote}
+const save=()=>localStorage.setItem(KEY,JSON.stringify(V));
+
+document.title='Storyboard — '+BOARD.deck;
+hTitle.textContent='Storyboard — '+BOARD.deck;
+hSub.innerHTML='<b>Direction:</b> '+BOARD.direction+
+  ' &nbsp;·&nbsp; Wireframes are deliberately gray — judge structure, copy, effects and art direction, not polish. '+
+  'Hover a thumbnail and click to replay its motion. '+
+  '<b>Open “Speaker note” on any card to read and edit what you would actually say</b> — the notes are '+
+  'the talk, the slides are captions for it, so a note that will not come out of your mouth is the '+
+  'cheapest thing to fix at this stage.';
+hMeta.innerHTML=`<span><b>theme</b> ${BOARD.theme}</span><span><b>fx</b> ${BOARD.fx}</span>`+
+  `<span><b>transition</b> ${BOARD.trans||'—'}</span><span><b>slides</b> ${BOARD.slides.length}</span>`+
+  `<span><b>art</b> ${BOARD.art||'none'}</span>`;
+
+for(const s of BOARD.slides){
+  const card=el('div','card');card.dataset.n=s.n;
+  const th=el('div','thumb'+(BOARD.theme!=='dark'&&s.format!=='section'?' light':''));
+  /* full-bleed art layer only for bleed treatments; framed art lives inside
+     the wireframe's own image zone (two-column draws it there itself) */
+  const artSrc = s.art ? (s.art.src || (s.art.candidates||[])[0]?.src) : null;
+  if(artSrc&&(!s.art.treatment||s.art.treatment.startsWith('.bleed'))){
+    th.append(el('div','art'));th.lastChild.style.backgroundImage=`url(${artSrc})`;
+    th.append(el('div','scrim'))}
+  const wf=wire(s,1.0,artSrc);th.append(wf);
+  th.append(Object.assign(el('div','replay'),{textContent:'REPLAY'}));
+  const play=()=>{ if(s.fx)mountFX(th,s.fx,s.fxOver);
+    th.querySelectorAll('.hl[data-fx-text]').forEach(treatHeadline)};
+  th.onclick=()=>{th.querySelectorAll('.fxc').forEach(n=>n.remove());
+    const hl=th.querySelector('.hl');if(hl&&s.fxText){const t=hl.dataset.orig||hl.textContent;
+      hl.dataset.orig=t;hl.textContent=t;hl.style.cssText='';hl.dataset.fxText=s.fxText;
+      hl.style.fontSize=getComputedStyle(hl).fontSize}
+    play()};
+  const body=el('div','body');
+  const tags=[`<span class="tag">${s.format}</span>`];
+  if(s.chart)tags.push(`<span class="tag">${s.chart} chart</span>`);
+  if(s.fx)tags.push(`<span class="tag fx">${s.fx}${s.fxOver?' · over':''}</span>`);
+  if(s.fxText)tags.push(`<span class="tag fx">${s.fxText} headline</span>`);
+  if(s.art)tags.push(`<span class="tag art">art · ${s.art.source==='pexels'?'pexels (free)':(s.art.tier||'pro final')}</span>`);
+  body.innerHTML=tags.join('')+
+    `<h3><i>${String(s.n).padStart(2,'0')}</i>${s.title}</h3>`+
+    `<div class="words">“${s.head}”${s.words?' — '+s.words:''}</div>`+
+    (s.why?`<div class="why"><b>Thinking:</b> ${s.why}</div>`:'')+
+    (s.art?`<div class="artline">art: ${s.art.source==='pexels'
+        ? `pexels · ${(s.art.candidates||[]).length} candidates — pick one below`
+        : s.art.prompt} → ${s.art.treatment||'.bleed.art'}</div>`:'');
+  /* ---- speaker note: the thing you'll actually SAY. Collapsed, editable. ---- */
+  const noteSrc=s.note||'';
+  const nd=el('details','note'+(noteSrc?'':' none'));
+  nd.innerHTML=`<summary><b>Speaker note</b><span class="wc"></span></summary>`+
+    `<textarea spellcheck="true" placeholder="What you'd say out loud on this slide…"></textarea>`+
+    `<p class="nh">Blank line = new paragraph. This is spoken, not shown.</p>`;
+  const nta=nd.querySelector('textarea'), nwc=nd.querySelector('.wc');
+  nta.value=(V[s.n]||{}).note2!==undefined?V[s.n].note2:noteSrc;
+  const paintNote=()=>{const t=nta.value.trim(),chg=nta.value!==noteSrc;
+    nwc.textContent=(t?t.split(/\s+/).length+' words':'none yet')+(chg?' · edited':'');
+    nwc.className='wc'+(chg?' chg':'')};
+  nta.oninput=()=>{V[s.n]=V[s.n]||{};V[s.n].note2=nta.value;save();paintNote();tally()};
+  paintNote();
+  body.append(nd);
+  /* stock art: show the candidate set and let the user choose which photo */
+  if(s.art&&s.art.candidates&&s.art.candidates.length){
+    const strip=el('div','cands');
+    s.art.candidates.forEach((c,i)=>{
+      const fig=el('figure');fig.dataset.i=i;
+      const img=el('img');img.src=c.src;img.alt=c.alt||'';
+      const cap=el('figcaption');cap.textContent=(i+1)+' · '+(c.photographer||'');
+      fig.append(img,cap);
+      fig.onclick=()=>{
+        V[s.n]=V[s.n]||{};
+        V[s.n].photo = V[s.n].photo===i ? null : i;
+        save();
+        strip.querySelectorAll('figure').forEach(x=>
+          x.classList.toggle('chosen',+x.dataset.i===V[s.n].photo));
+        /* selected photo previews straight into the thumbnail */
+        const bleed=th.querySelector('.thumb>.art'), framed=th.querySelector('[data-artzone]');
+        const chosenSrc = s.art.candidates[V[s.n].photo!=null?V[s.n].photo:0].src;
+        if(bleed&&chosenSrc)bleed.style.backgroundImage=`url(${chosenSrc})`;
+        if(framed&&chosenSrc)framed.style.background=`url(${chosenSrc}) center/cover`;
+      };
+      if((V[s.n]||{}).photo===i)fig.classList.add('chosen');
+      strip.append(fig);
+    });
+    body.append(strip);
+  }
+  const v=el('div','verdict');
+  v.innerHTML=`<button data-v="keep">✓ keep</button><button data-v="change">✎ change</button>`+
+    `<button data-v="cut">✕ cut</button><input placeholder="what should change…">`;
+  const inp=v.querySelector('input');
+  const paint=()=>{const cv=(V[s.n]||{}).verdict;card.dataset.verdict=cv||'';
+    v.querySelectorAll('button').forEach(b=>b.className=b.dataset.v===cv?'on-'+cv:'');
+    inp.value=(V[s.n]||{}).note||'';tally()};
+  v.querySelectorAll('button').forEach(b=>b.onclick=()=>{
+    V[s.n]=V[s.n]||{};V[s.n].verdict=V[s.n].verdict===b.dataset.v?null:b.dataset.v;save();paint()});
+  inp.oninput=()=>{V[s.n]=V[s.n]||{};V[s.n].note=inp.value;save();tally()};
+  card.append(th,body,v);grid.append(card);
+  requestAnimationFrame(play);
+  card._paint=paint;paint();
+}
+deckNote.value=V.deckNote||'';
+deckNote.oninput=()=>{V.deckNote=deckNote.value;save()};
+function tally(){
+  const vs=BOARD.slides.map(s=>(V[s.n]||{}).verdict);
+  const k=vs.filter(x=>x==='keep').length,c=vs.filter(x=>x==='change').length,
+        x=vs.filter(x=>x==='cut').length,u=vs.filter(x=>!x).length;
+  const ne=BOARD.slides.filter(s=>(V[s.n]||{}).note2!==undefined&&V[s.n].note2!==(s.note||'')).length;
+  const miss=BOARD.slides.filter(s=>!((V[s.n]||{}).note2!==undefined?V[s.n].note2:s.note||'').trim()).length;
+  tally.el=tally.el||document.getElementById('tally');
+  tally.el.textContent=`${k} keep · ${c} change · ${x} cut · ${u} unmarked`+
+    (ne?` · ${ne} note${ne>1?'s':''} edited`:'')+(miss?` · ${miss} without a note`:'');
+}
+tally();
+document.getElementById('allNotes').onclick=e=>{
+  const ns=[...document.querySelectorAll('details.note')];
+  const open=ns.every(n=>n.open);ns.forEach(n=>n.open=!open);
+  e.target.textContent=open?'Read all notes':'Collapse all notes';
+};
+copy.onclick=()=>{
+  const L=[`## Storyboard verdicts — ${BOARD.deck}`,''];
+  for(const s of BOARD.slides){
+    const v=V[s.n]||{};if(!v.verdict&&!v.note&&v.photo==null)continue;
+    const pick = v.photo!=null&&s.art&&s.art.candidates
+      ? ` · photo #${v.photo+1} (${s.art.candidates[v.photo].photographer||''}${
+          s.art.candidates[v.photo].id?', id '+s.art.candidates[v.photo].id:''})` : '';
+    L.push(`- **${s.n} · ${s.title}** [${s.format}${s.fx?' · '+s.fx:''}] → ${(v.verdict||'unmarked').toUpperCase()}${pick}`+
+      (v.note?` — ${v.note}`:''));
+  }
+  if(![...L].some(l=>l.startsWith('- ')))L.push('_No per-slide verdicts marked (unmarked = keep as planned)._');
+  if(V.deckNote)L.push('','**Deck-level:** '+V.deckNote);
+  /* edited speaker notes travel back too — they are the script, and they
+     override whatever the build would otherwise have written */
+  const edited=BOARD.slides.filter(s=>(V[s.n]||{}).note2!==undefined&&V[s.n].note2!==(s.note||''));
+  if(edited.length){
+    L.push('','## Speaker-note edits','');
+    for(const s of edited){
+      L.push(`### ${s.n} · ${s.title}`,'');
+      L.push(V[s.n].note2.trim()||'_(no note — leave this slide without one)_','');
+    }
+  }
+  const md=L.join('\n');
+  navigator.clipboard?.writeText(md).then(
+    ()=>{copy.textContent='Copied — paste to Claude';setTimeout(()=>copy.textContent='Copy feedback for Claude',2200)},
+    ()=>prompt('Copy this:',md));
+};
+</script>
+</body>
+</html>

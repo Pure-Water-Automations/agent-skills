@@ -1,0 +1,401 @@
+<!--
+  SLIDE FORMAT LIBRARY — 15 formats. Copy a block into deck-engine.html between
+  the two SLIDES markers and replace the copy.
+
+  RULES
+  - Every slide is <section class="slide" data-title="short name for the grid">.
+  - Put data-anim on each thing that should fade up in sequence (order = markup order).
+    data-anim="pop" for badges/stats, data-anim="grow" for bars/rules.
+  - Never use two of the same format back to back. Vary the rhythm.
+  - Word budgets are ceilings, not targets. Overflow is a QA failure.
+  - A trailing footnote caption goes INSIDE the centring wrapper (.steps, .timeline,
+    .fill) — outside it, flexbox strands it at the bottom of the slide. Charts are
+    the exception: the caption follows .chart directly.
+  - A bare block (table, <pre>, single image) needs a .fill wrapper or it hugs the top.
+  - Every slide ends with <aside class="notes"><p>…</p></aside> — everything the
+    headline had to cut, written to be spoken. Never rendered on the slide; `s`
+    opens the presenter panel.
+  - Pick the visual move BEFORE the format. Three cards is the default that makes
+    decks forgettable — see references/styles.md.
+
+  INDEX
+   1 cover        2 section      3 statement    4 two-column   5 stat-grid
+   6 bullets      7 steps        8 compare      9 table       10 timeline
+  11 chart       12 quote       13 code        14 closing     15 grid4
+  16 badges + area bands (not a slide — a motif you reuse across slides)
+-->
+
+<!-- ============================================================ 1. COVER
+     Opens the deck. Optional full-bleed background image at 16% opacity. -->
+<section class="slide cover" data-title="Cover">
+  <div class="bleed mask"><img src="images/cover.jpg" alt=""></div>
+  <p class="eyebrow" data-anim>Programme · proposal for approval</p>
+  <h1 class="display" data-anim>The Formation Year</h1>
+  <p class="lead" data-anim>Real projects. Real leaders. A disciplined budget.</p>
+  <div class="meta" data-anim><span>Presenter Name</span><span>August 2026</span><span>HQ leadership</span></div>
+  <aside class="notes"><p>Everything the headline had to cut goes here, written the way
+    you'd say it out loud. Press <em>s</em> while presenting. Every slide gets one.</p></aside>
+</section>
+
+<!-- ============================================================ 2. SECTION DIVIDER
+     Solid accent slide. Use 2–4 per deck to chapter the story. -->
+<section class="slide section-slide" data-title="Section: The plan">
+  <p class="eyebrow" data-anim>Part two</p>
+  <h2 class="display" data-anim>How the year is built</h2>
+</section>
+
+<!-- ============================================================ 3. STATEMENT
+     One idea, nothing else. The deck's punctuation mark. -->
+<section class="slide" data-title="Statement">
+  <div class="orb" style="width:420px;height:420px;background:var(--accent);top:-120px;right:-90px"></div>
+  <div class="spacer"></div>
+  <p class="eyebrow" data-anim>The design principle</p>
+  <h2 class="display" data-anim>Projects, not classes.</h2>
+  <p class="lead" data-anim style="max-width:44ch">Leaders are formed by shipping real work in a real community — then presenting the evidence.</p>
+  <div class="spacer"></div>
+</section>
+
+<!-- ============================================================ 4. TWO-COLUMN
+     Text + image, or text + card. .wide-left / .wide-right shift the ratio. -->
+<section class="slide" data-title="Two column">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Where Advance sits</p>
+    <h2 data-anim>A pipeline, not a one-off</h2>
+  </div>
+  <div class="cols wide-left">
+    <div>
+      <p data-anim>Youth and NGM feed it. College and trade run alongside. Advance forms the leader; the field receives them.</p>
+      <ul class="bullets" style="margin-top:26px;gap:12px" >
+        <li data-anim><span class="dot">1</span><span>Feeder programmes stay upstream<small>Youth &amp; NGM keep their own mandate</small></span></li>
+        <li data-anim><span class="dot">2</span><span>Advance is the formation layer<small>51 weeks, 11 modules</small></span></li>
+      </ul>
+    </div>
+    <div class="imgframe" data-anim style="aspect-ratio:4/3">
+      <img src="images/pipeline.png" alt="Pipeline diagram">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 5. STAT GRID
+     Exactly 3 stats. data-count animates the number up on slide enter. -->
+<section class="slide" data-title="Three numbers">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>The whole programme</p>
+    <h2 data-anim>Three numbers that frame it</h2>
+  </div>
+  <div class="stats">
+    <div class="card" data-anim>
+      <span class="stat" data-count="264" data-prefix="$" data-suffix="K">$264K</span>
+      <span class="kicker">Total cost</span>
+      <p class="small">One programme, two funding streams.</p>
+    </div>
+    <div class="card" data-anim>
+      <span class="stat" data-count="40">40</span>
+      <span class="kicker">Participants</span>
+      <p class="small">Residency plus field track.</p>
+    </div>
+    <div class="card" data-anim>
+      <span class="stat" data-count="51">51</span>
+      <span class="kicker">Weeks</span>
+      <p class="small">Oct 2026 → graduation Sept 2027.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 6. BULLETS
+     4–6 lines max, each with an optional <small> subline. -->
+<section class="slide" data-title="Key points">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Proof of formation</p>
+    <h2 data-anim>Four things they will have built</h2>
+  </div>
+  <ul class="bullets">
+    <li data-anim><span class="dot">✓</span><span>A team<small>Recruited, trained, still running at graduation</small></span></li>
+    <li data-anim><span class="dot">✓</span><span>An event<small>Planned and delivered in their own post</small></span></li>
+    <li data-anim><span class="dot">✓</span><span>A funded need<small>A real budget raised and spent</small></span></li>
+    <li data-anim><span class="dot">✓</span><span>One person<small>Mentored end-to-end for the year</small></span></li>
+  </ul>
+</section>
+
+<!-- ============================================================ 7. STEPS
+     Exactly 3. Numbered badges on a connector line. -->
+<section class="slide" data-title="How a module works">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>How a module works</p>
+    <h2 data-anim>Learn, build, present</h2>
+  </div>
+  <div class="steps">
+    <div class="steps-row">
+      <div class="connector" data-anim="grow"></div>
+      <div class="card" data-anim>
+        <span class="badge" data-anim="pop">1</span>
+        <h3>Learn</h3><p class="small">Weekly teaching session, one hour, live.</p>
+      </div>
+      <div class="card" data-anim>
+        <span class="badge" data-anim="pop">2</span>
+        <h3>Build</h3><p class="small">The project runs in their own post, not a classroom.</p>
+      </div>
+      <div class="card" data-anim>
+        <span class="badge" data-anim="pop">3</span>
+        <h3>Present</h3><p class="small">Checkpoint at module end, evidence shown to peers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 8. COMPARE
+     Two options side by side. .yes / .no colour the marks. -->
+<section class="slide" data-title="Year 1 vs Year 2">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Year 1 versus year 2</p>
+    <h2 data-anim>What changed</h2>
+  </div>
+  <div class="vs">
+    <div class="card" data-anim>
+      <h3>Year 1 <span class="pill">pilot</span></h3>
+      <ul>
+        <li><span class="mark no">–</span><span>Classroom-weighted, one cohort</span></li>
+        <li><span class="mark no">–</span><span>Cost per leader formed: high</span></li>
+        <li><span class="mark yes">+</span><span>Proved the teaching model</span></li>
+      </ul>
+    </div>
+    <div class="card tint" data-anim>
+      <h3>Year 2 <span class="pill">proposed</span></h3>
+      <ul>
+        <li><span class="mark yes">+</span><span>Project-based, three audiences</span></li>
+        <li><span class="mark yes">+</span><span>5× more leaders formed per dollar</span></li>
+        <li><span class="mark yes">+</span><span>Graduation tied to the assembly</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 9. TABLE
+     Max 5 rows / 4 columns on one slide. .t-num right-aligns numbers. -->
+<section class="slide" data-title="Budget table">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>The $120K contract</p>
+    <h2 data-anim>Where the contract goes</h2>
+  </div>
+  <div class="fill">
+    <table data-anim>
+      <thead><tr><th>Line</th><th>What it covers</th><th class="t-num">Amount</th><th class="t-num">Share</th></tr></thead>
+      <tbody>
+        <tr><td>Coordination &amp; staffing</td><td>Programme lead, pod coaches</td><td class="t-num">$71,000</td><td class="t-num">59%</td></tr>
+        <tr><td>Workshops &amp; delivery</td><td>Three anchor workshops</td><td class="t-num">$32,000</td><td class="t-num">27%</td></tr>
+        <tr><td>Admin &amp; technology</td><td>Tooling, travel, materials</td><td class="t-num">$17,000</td><td class="t-num">14%</td></tr>
+      </tbody>
+    </table>
+    <p class="small" data-anim style="margin-top:18px">Figures rounded. Full line-item budget in the appendix.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 10. TIMELINE / ROADMAP
+     3–5 nodes. Add class="done" to a node to mark it complete. -->
+<section class="slide" data-title="The 51-week map">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>The 51-week map</p>
+    <h2 data-anim>The shape of the year</h2>
+  </div>
+  <div class="timeline">
+    <div class="timeline-row">
+      <div class="track" data-anim="grow"></div>
+      <div class="node done" data-anim><span class="dot"></span><p class="when">Weeks 1–5</p>
+        <h3>Faith</h3><p>Covenant, habits, the person.</p></div>
+      <div class="node" data-anim><span class="dot"></span><p class="when">Weeks 6–20</p>
+        <h3>Operations</h3><p>Team, event, budget — built live.</p></div>
+      <div class="node" data-anim><span class="dot"></span><p class="when">Weeks 21–28</p>
+        <h3>Resources</h3><p>The funded need, start to finish.</p></div>
+      <div class="node" data-anim><span class="dot"></span><p class="when">Weeks 29–51</p>
+        <h3>Mission</h3><p>Deploy, evaluate, graduate.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 11. CHART
+     type: bar | stacked | line | donut. Hover gives a tooltip for free.
+     Keep to 3 series max — the palette is validated for 3 all-pairs. -->
+<section class="slide" data-title="Chart: cost split">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Evidence</p>
+    <h2 data-anim>Cost per leader formed, by year</h2>
+  </div>
+  <div class="chart" data-anim data-chart='{
+    "type":"bar","unit":"$","valueLabels":true,
+    "series":[{"name":"Cost per leader","color":"var(--s1)"}],
+    "data":[{"label":"Year 1","values":[6600]},{"label":"Year 2","values":[1320]}]}'></div>
+</section>
+
+<!-- stacked variant -->
+<section class="slide" data-title="Chart: funding streams">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Two funding streams</p>
+    <h2 data-anim>Who pays for what</h2>
+  </div>
+  <div class="chart" data-anim data-chart='{
+    "type":"stacked","unit":"$","suffix":"K",
+    "series":[{"name":"HQ contract","color":"var(--s1)"},
+              {"name":"Sponsorship","color":"var(--s2)"},
+              {"name":"Local share","color":"var(--s3)"}],
+    "data":[{"label":"Year 1","values":[90,20,10]},{"label":"Year 2","values":[120,48,96]}]}'></div>
+</section>
+
+<!-- line variant -->
+<section class="slide" data-title="Chart: growth">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Trajectory</p>
+    <h2 data-anim>Leaders formed per year</h2>
+  </div>
+  <div class="chart" data-anim data-chart='{
+    "type":"line",
+    "series":[{"name":"Formed","color":"var(--s1)"},{"name":"Deployed","color":"var(--s2)"}],
+    "data":[{"label":"2025","values":[8,5]},{"label":"2026","values":[14,10]},
+            {"label":"2027","values":[40,32]},{"label":"2028","values":[70,60]}]}'></div>
+</section>
+
+<!-- donut variant -->
+<section class="slide" data-title="Chart: contract split">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>The $120K contract</p>
+    <h2 data-anim>Three lines, one budget</h2>
+  </div>
+  <div class="chart" data-anim data-chart='{
+    "type":"donut","unit":"$","suffix":"K","centerLabel":"$120K","centerSub":"contract",
+    "series":[{"name":"Coordination","color":"var(--s1)"},{"name":"Workshops","color":"var(--s2)"},
+              {"name":"Admin","color":"var(--s3)"}],
+    "data":[{"label":"Coordination & staffing","values":[71]},
+            {"label":"Workshops & delivery","values":[32]},
+            {"label":"Admin & technology","values":[17]}]}'></div>
+</section>
+
+<!-- ============================================================ 12. QUOTE
+     One quote, under 26 words, with attribution. -->
+<section class="slide" data-title="Quote">
+  <div class="quote">
+    <blockquote data-anim>The programme stopped feeling like school the week we had to raise the money ourselves.</blockquote>
+    <div class="byline" data-anim>
+      <span class="avatar">MK</span>
+      <span><b>Minjae Kim</b><br><span class="small">Year 1 participant, Northeast post</span></span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ 13. CODE
+     Under 14 lines. Wrap tokens: .k keyword .s string .n number .c comment -->
+<section class="slide" data-title="Code">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Under the hood</p>
+    <h2 data-anim>Reporting is one command</h2>
+  </div>
+  <div class="fill">
+<pre data-anim><span class="c"># weekly cohort report, straight from the tracker</span>
+<span class="k">node</span> report.js --week <span class="n">14</span> --cohort advance-y2 \
+  --out reports/week-14.pdf</pre>
+    <p class="small" data-anim style="margin-top:18px">Coaches get the same file every Monday at 07:00.</p>
+  </div>
+</section>
+
+<!-- ============================================================ 15. GRID4
+     Exactly 4 equal cards, 2x2. For "four things" that aren't a sequence. -->
+<section class="slide" data-title="Four things">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Proof of formation</p>
+    <h2 data-anim>Four things they will have built</h2>
+  </div>
+  <div class="grid4">
+    <div class="card" data-anim><h3><span class="dot">01</span>A team</h3>
+      <p class="small">Named, recruited, still showing up at graduation.</p></div>
+    <div class="card" data-anim><h3><span class="dot">02</span>An event</h3>
+      <p class="small">Planned and hosted in their own community.</p></div>
+    <div class="card" data-anim><h3><span class="dot">03</span>A funded need</h3>
+      <p class="small">A real material need, raised for and completed.</p></div>
+    <div class="card" data-anim><h3><span class="dot">04</span>One person</h3>
+      <p class="small">Walked from guest to active over the year.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================ 16. BADGES + AREA BANDS
+     NOT a slide format — a motif. When a deck keeps returning to the same small
+     set of named things (a framework's areas, workstreams, product lines, phases),
+     give each one a glyph and reuse it EVERYWHERE it is mentioned. That is what
+     turns "six words we listed once" into something the room recognises on sight
+     by slide 20.
+
+     The engine ships a 6-glyph sprite (#gl-faith … #gl-direction) as a starting
+     set — geometric line drawings on a 24×24 grid, stroke 2, currentColor, so they
+     theme themselves. Rename or add your own <g id="gl-…"> in the sprite for a
+     different framework; do NOT reach for generated art or an icon font. Generated
+     icons don't survive being shrunk to 20px, vary in weight across a set, and
+     can't follow the theme.
+
+     Three placements, all in this deck's Advance Year 2 build:
+       1. the teaching slide — glyph beside each name, where the mapping is learned
+       2. every slide inside that area — glyph in the eyebrow, as a "you are here"
+       3. above a timeline — .areas bands grouping the nodes each area covers  -->
+
+<!-- 16a. glyph + label inside a bullets list (the teaching slide) -->
+<section class="slide" data-title="The framework">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>The spine</p>
+    <h2 data-anim>FORMED — the order a leader is built in</h2>
+  </div>
+  <ul class="bullets">
+    <li data-anim><span class="dot">F</span><span>
+      <span class="chip plain"><svg class="gl"><use href="#gl-faith"></use></svg>Faith</span>
+      <small>Who you are before you lead anyone</small></span></li>
+    <li data-anim><span class="dot">O</span><span>
+      <span class="chip plain"><svg class="gl"><use href="#gl-operations"></use></svg>Operations</span>
+      <small>A team, an event, and a system that runs</small></span></li>
+  </ul>
+  <aside class="notes"><p>The letter dot keeps the acronym readable down the left edge;
+    the glyph is what gets reused elsewhere.</p></aside>
+</section>
+
+<!-- 16b. glyph in the eyebrow — "you are in this area" on every slide of it -->
+<section class="slide" data-title="A module inside an area">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim><svg class="gl"><use href="#gl-resources"></use></svg>Resources · module 7 of 11 · eight weeks</p>
+    <h2 data-anim>Fund a Real Need</h2>
+  </div>
+  <div class="fill"><p data-anim>Body copy.</p></div>
+</section>
+
+<!-- 16c. .areas — labelled bands ABOVE a timeline, grouping the nodes they cover.
+     flex-grow = number of nodes spanned: 2 nodes + 2 nodes is flex:2 / flex:2,
+     2 + 1 is flex:2 / flex:1. MUST live INSIDE .timeline as its first child —
+     put it outside and the timeline centres itself in the leftover space and
+     floats away from its own labels. -->
+<section class="slide" data-title="Term map with area bands">
+  <div class="slide-head">
+    <p class="eyebrow" data-anim>Trimester one · Launch</p>
+    <h2 data-anim>Four modules, thirteen weeks</h2>
+  </div>
+  <div class="timeline">
+    <div class="areas" data-anim>
+      <div class="area" style="flex:2"><svg class="gl"><use href="#gl-faith"></use></svg><span>Faith</span></div>
+      <div class="area" style="flex:2"><svg class="gl"><use href="#gl-operations"></use></svg><span>Operations</span></div>
+    </div>
+    <div class="timeline-row">
+      <div class="track" data-anim="grow"></div>
+      <div class="node" data-anim><span class="dot"></span><p class="when">3 weeks</p><h3>Foundations</h3></div>
+      <div class="node" data-anim><span class="dot"></span><p class="when">2 weeks</p><h3>Ownership</h3></div>
+      <div class="node" data-anim><span class="dot"></span><p class="when">6 weeks</p><h3>Team Building</h3></div>
+      <div class="node" data-anim><span class="dot"></span><p class="when">2 weeks</p><h3>Applied AI</h3></div>
+    </div>
+  </div>
+  <aside class="notes"><p>With the band naming the area, drop the area word from each
+    node — otherwise it's said twice on one slide.</p></aside>
+</section>
+
+<!-- ============================================================ 14. CLOSING / ASK
+     The decision you want. Never end on "thank you". -->
+<section class="slide cover" data-title="The ask">
+  <div class="orb" style="width:420px;height:420px;background:var(--accent-2);bottom:-220px;left:-170px"></div>
+  <p class="eyebrow" data-anim>The ask</p>
+  <h1 class="display" data-anim>Approve it, launch at the assembly.</h1>
+  <p class="lead" data-anim>Forty formed leaders by September 2027.</p>
+  <div class="meta" data-anim>
+    <span>1 · Approve the $120K contract</span><span>2 · Confirm the summit share</span>
+    <span>3 · Price the Korean instructor</span>
+  </div>
+</section>

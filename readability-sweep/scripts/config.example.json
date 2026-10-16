@@ -1,0 +1,28 @@
+{
+  "base": "http://localhost:3000",
+  "out": "readability-sweep",
+  "settleMs": 900,
+  "maxScroll": 9000,
+  "removeSelectors": ["nextjs-portal"],
+  "themes": [
+    { "name": "light", "colorScheme": "light" },
+    { "name": "dark-os", "colorScheme": "dark" },
+    { "name": "dark-toggle", "colorScheme": "light", "localStorage": { "theme": "dark" }, "viewports": ["desk"] },
+    { "name": "sepia", "colorScheme": "light", "localStorage": { "theme": "sepia" } }
+  ],
+  "viewports": [
+    { "name": "desk", "width": 1440, "height": 900 },
+    { "name": "phone", "width": 390, "height": 844 }
+  ],
+  "auth": { "cookie": { "name": "session", "valueFile": "session.token" } },
+  "pages": [
+    { "path": "/", "signedIn": true },
+    { "path": "/search?q=forgiveness", "signedIn": true, "settleMs": 2500,
+      "actions": [
+        { "name": "filters", "click": "button:has-text('Filters')" },
+        { "name": "first-card-more", "click": "article button:has-text('More')" }
+      ] },
+    { "path": "/about" },
+    { "path": "/story", "themes": ["light"], "scrollStops": [0, 1.5, 3, 4.5, 6, 7.5, 9], "scrollWaitMs": 1400 }
+  ]
+}
