@@ -18,7 +18,7 @@ description: >-
   "I need slides for the board/assembly/team", "deck for this proposal", or
   hands over an outline/doc/pptx and wants it presentable. Also use for
   investor/board/proposal decks and conference talks. NOT for a written
-  tutorial script (tutorial-script), NOT for a narrated video
+  tutorial script (tutorial-studio), NOT for a narrated video
   (app-tutorial-video), NOT for a .pptx file as the required deliverable —
   though this skill exports PDF and can be told to keep a .pptx twin.
 works-in: Claude
