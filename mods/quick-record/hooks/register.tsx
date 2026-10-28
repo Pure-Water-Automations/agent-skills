@@ -3,9 +3,15 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { Phase } from '../types'
 
-// rec lives next to this mod; REC_DIR moves the recordings (default ~/Recordings).
-const SCRIPT = ['sh', '-c', '"$HOME/.claude/mods/quick-record/rec"']
-const IS_RECORDING = ['sh', '-c', 'test -f "${REC_DIR:-$HOME/Recordings}/.recording"']
+// rec (macOS) / rec.ps1 (Windows) live next to this mod; REC_DIR moves the recordings (default ~/Recordings).
+const WIN = (globalThis as { process?: { platform?: string } }).process?.platform === 'win32'
+const PS = ['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command']
+const SCRIPT = WIN
+  ? [...PS, '& "$env:USERPROFILE\\.claude\\mods\\quick-record\\rec.ps1"']
+  : ['sh', '-c', '"$HOME/.claude/mods/quick-record/rec"']
+const IS_RECORDING = WIN
+  ? [...PS, '$d = if ($env:REC_DIR) { $env:REC_DIR } else { "$env:USERPROFILE\\Recordings" }; if (Test-Path "$d\\.recording") { exit 0 } else { exit 1 }']
+  : ['sh', '-c', 'test -f "${REC_DIR:-$HOME/Recordings}/.recording"']
 const phase = atom({ plugin: 'quick-record', key: 'phase' } as const, 'idle' as Phase)
 
 // One toggle for the button and /rec. Returns a line for the transcript.

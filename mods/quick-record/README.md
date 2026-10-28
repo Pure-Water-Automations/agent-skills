@@ -1,11 +1,11 @@
 # quick-record (`/rec`)
 
-A Claude Code mod for macOS. It adds a **● Record screen** button above the prompt and a `/rec`
+A Claude Code mod for macOS and Windows. It adds a **● Record screen** button above the prompt and a `/rec`
 command. Press it, talk through what you see, press **■ Stop**. The mod transcribes your voice,
 grabs a frame every 5 seconds, and puts the path of one `README.md` (transcript + frames) into
 your prompt, so Claude sees and hears your feedback.
 
-## Install
+## Install on a Mac
 
 **Easiest: paste this into Claude Code** and let it do the steps:
 
@@ -30,6 +30,24 @@ cp -R ~/agent-skills/mods/quick-record ~/.claude/mods/quick-record
 
 Restart Claude Code. The first recording asks macOS for Screen Recording and Microphone
 permission; allow both, then restart Claude Code once more.
+
+## Install on Windows (PC)
+
+**Easiest: paste this into Claude Code** and let it do the steps:
+
+```text
+Install the /rec screen-recording mod for Claude Code on my Windows PC:
+1. Install ffmpeg: winget install --id Gyan.FFmpeg -e (accept the prompts), then check ffmpeg -version works in a new PowerShell window.
+2. Get the mod: clone https://github.com/Pure-Water-Automations/agent-skills to %USERPROFILE%\agent-skills (if it is already there, git pull instead), then copy %USERPROFILE%\agent-skills\mods\quick-record to %USERPROFILE%\.claude\mods\quick-record.
+3. Get whisper: download whisper-bin-x64.zip from the latest release at https://github.com/ggml-org/whisper.cpp/releases and unzip it so whisper-cli.exe (and its DLLs) sit in %USERPROFILE%\.claude\mods\quick-record\bin.
+4. Download the speech model: curl.exe -L --create-dirs -o %USERPROFILE%\.cache\whisper\ggml-small.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en.bin
+5. Check ffmpeg, bin\whisper-cli.exe and the model file all exist, then tell me to restart Claude Code. If Windows asks about microphone access the first time I record, I should allow it.
+```
+
+The Windows version (`rec.ps1`) records the whole screen and the first microphone ffmpeg finds;
+set `REC_MIC` to a microphone's name to pick another (list them:
+`ffmpeg -list_devices true -f dshow -i dummy`). It has no pop-up notifications; the button shows
+what is happening.
 
 **Use it:** click **● Record screen** above the prompt (or type `/rec`), talk while you show the
 screen, click **■ Stop**, then press Enter when the path appears in your prompt.
