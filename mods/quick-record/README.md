@@ -7,15 +7,32 @@ your prompt, so Claude sees and hears your feedback.
 
 ## Install
 
+**Easiest: paste this into Claude Code** and let it do the steps:
+
+```text
+Install the /rec screen-recording mod for Claude Code on my Mac:
+1. If Homebrew is missing, tell me how to install it and stop. Otherwise run: brew install ffmpeg whisper-cpp
+2. Download the speech model: mkdir -p ~/.cache/whisper && curl -L -o ~/.cache/whisper/ggml-small.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en.bin
+3. Get the mod: clone https://github.com/Pure-Water-Automations/agent-skills to ~/agent-skills (if it is already there, git pull instead).
+4. Copy ~/agent-skills/mods/quick-record to ~/.claude/mods/quick-record and make ~/.claude/mods/quick-record/rec executable.
+5. Check that ffmpeg, whisper-cli and the model file all exist, then tell me to restart Claude Code. Remind me that the first recording asks macOS for Screen Recording and Microphone permission: allow both, then restart Claude Code once more.
+```
+
+**By hand** (Terminal):
+
 ```bash
 brew install ffmpeg whisper-cpp
 mkdir -p ~/.cache/whisper && curl -L -o ~/.cache/whisper/ggml-small.en.bin \
   https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en.bin
+git clone https://github.com/Pure-Water-Automations/agent-skills ~/agent-skills
 cp -R ~/agent-skills/mods/quick-record ~/.claude/mods/quick-record
 ```
 
 Restart Claude Code. The first recording asks macOS for Screen Recording and Microphone
-permission for your terminal; allow both, then restart it once more.
+permission; allow both, then restart Claude Code once more.
+
+**Use it:** click **● Record screen** above the prompt (or type `/rec`), talk while you show the
+screen, click **■ Stop**, then press Enter when the path appears in your prompt.
 
 ## Settings (environment variables, all optional)
 
