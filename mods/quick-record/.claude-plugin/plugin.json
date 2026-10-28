@@ -1,0 +1,1 @@
+{ "name": "quick-record", "version": "0.2.0", "description": "Record button above the prompt (and /rec): screen+mic recording whose transcript path lands in your prompt", "types": "./types/index.d.ts" }

@@ -35,6 +35,14 @@ is never part of this repo.
 | [`slides`](slides/SKILL.md) | Build a beautiful, animated, self-contained HTML slide deck from a rough outline, a topic, a document, or an existing PowerPoint — instead of dragging boxes around in PowerPoint or Google Slides.… |
 <!-- skills:end -->
 
+## Mods
+
+Mods change Claude Code's own interface. Copy a folder into `~/.claude/mods/` and restart.
+
+| Mod | What it does |
+|---|---|
+| [`quick-record`](mods/quick-record/README.md) | `/rec` and a Record button above the prompt: record your screen and voice on macOS; the transcript and frames land in your prompt |
+
 ## Notes
 
 - This repo is generated: skills are edited in our workspace and synced here automatically,

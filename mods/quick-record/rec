@@ -1,0 +1,66 @@
+#!/bin/zsh
+# Toggle screen+mic recording. Run once: starts. Run again: stops, transcribes,
+# grabs frames, copies the folder path to the clipboard for pasting into Claude.
+export PATH="/opt/homebrew/bin:$HOME/.local/bin:$PATH"
+
+OUT_ROOT="${REC_DIR:-$HOME/Recordings}"
+SCREEN="${REC_SCREEN:-Capture screen 0}"
+MIC="${REC_MIC:-0}"                  # audio device name or index; list: ffmpeg -f avfoundation -list_devices true -i ""
+MODEL="${REC_MODEL:-$HOME/.cache/whisper/ggml-small.en.bin}"
+FRAME_EVERY="${REC_FRAME_EVERY:-5}"   # seconds between keyframes
+MAX_MIN="${REC_MAX_MIN:-30}"          # ffmpeg stops itself after this; a forgotten one ran 10 h / 13 GB
+STATE="$OUT_ROOT/.recording"         # holds "<pid> <dir>" while recording
+
+notify() { osascript -e "display notification \"$1\" with title \"Quick Record\""; }
+
+mkdir -p "$OUT_ROOT"
+
+if [[ ! -f "$STATE" ]]; then
+  dir="$OUT_ROOT/$(date +%Y-%m-%d_%H%M%S)"
+  mkdir -p "$dir/frames"
+  nohup ffmpeg -hide_banner -loglevel error \
+    -f avfoundation -capture_cursor 1 -framerate 15 -i "$SCREEN:$MIC" \
+    -vf "scale=1920:-2" -c:v h264_videotoolbox -b:v 3M -c:a aac -t $(( MAX_MIN * 60 )) \
+    "$dir/video.mp4" >"$dir/ffmpeg.log" 2>&1 &
+  echo "$! $dir" >"$STATE"
+  # Still "recording" after the cap = it stopped on its own; tell the user to press the hotkey to finish it.
+  ( sleep $(( MAX_MIN * 60 + 5 )); grep -qF "$dir" "$STATE" 2>/dev/null && \
+    notify "Hit the ${MAX_MIN}-minute limit and stopped. Press the hotkey to finish it." ) >/dev/null 2>&1 &!
+  afplay /System/Library/Sounds/Tink.aiff &
+  notify "Recording… press the hotkey again to stop"
+  exit 0
+fi
+
+read pid dir <"$STATE"
+rm -f "$STATE"
+kill -INT "$pid" 2>/dev/null
+while kill -0 "$pid" 2>/dev/null; do sleep 0.2; done   # let ffmpeg finalize the mp4
+afplay /System/Library/Sounds/Pop.aiff &
+
+if [[ ! -s "$dir/video.mp4" ]]; then
+  notify "Recording failed — see $dir/ffmpeg.log"; exit 1
+fi
+notify "Transcribing…"
+
+ffmpeg -hide_banner -loglevel error -i "$dir/video.mp4" -ar 16000 -ac 1 "$dir/audio.wav"
+${commands[heavy]:+heavy} whisper-cli -m "$MODEL" -f "$dir/audio.wav" -osrt -of "$dir/transcript" -np >/dev/null 2>&1
+ffmpeg -hide_banner -loglevel error -i "$dir/video.mp4" \
+  -vf "fps=1/$FRAME_EVERY,scale=1280:-2" -q:v 4 "$dir/frames/f_%03d.jpg"
+rm -f "$dir/audio.wav"
+
+# One file Claude can read: transcript + which frame covers which second.
+{
+  echo "# Screen recording $(basename "$dir")"
+  echo
+  echo "Video: $dir/video.mp4"
+  echo "Frames: $dir/frames/f_NNN.jpg — frame N is at $(( FRAME_EVERY ))*(N-1) seconds"
+  echo
+  echo "## Transcript (SRT timestamps)"
+  echo
+  cat "$dir/transcript.srt" 2>/dev/null || echo "(no speech detected)"
+} >"$dir/README.md"
+
+printf '%s' "Screen recording with my feedback: $dir/README.md (read it, then look at the frames it points to)" | pbcopy
+afplay /System/Library/Sounds/Glass.aiff &
+notify "Done — path copied. Paste it into Claude."
+echo "$dir/README.md"
