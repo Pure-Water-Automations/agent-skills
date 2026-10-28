@@ -43,7 +43,10 @@ fi
 notify "Transcribing…"
 
 ffmpeg -hide_banner -loglevel error -i "$dir/video.mp4" -ar 16000 -ac 1 "$dir/audio.wav"
-${commands[heavy]:+heavy} whisper-cli -m "$MODEL" -f "$dir/audio.wav" -osrt -of "$dir/transcript" -np >/dev/null 2>&1
+# Under 10 min skip the heavy queue: small.en is light, and queueing behind a video render left people waiting.
+secs=$(ffprobe -v error -show_entries format=duration -of csv=p=0 "$dir/video.mp4" 2>/dev/null)
+(( ${${secs%.*}:-0} >= 600 )) && q=${commands[heavy]:+heavy} || q=
+$=q whisper-cli -m "$MODEL" -f "$dir/audio.wav" -osrt -of "$dir/transcript" -np >/dev/null 2>&1
 ffmpeg -hide_banner -loglevel error -i "$dir/video.mp4" \
   -vf "fps=1/$FRAME_EVERY,scale=1280:-2" -q:v 4 "$dir/frames/f_%03d.jpg"
 rm -f "$dir/audio.wav"
