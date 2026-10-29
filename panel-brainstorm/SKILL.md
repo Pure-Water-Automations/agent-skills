@@ -45,6 +45,8 @@ ideas** — not different wordings of the same lens. The proven mix:
 | Nervous newcomer ("Jomar") | day-3 confusion, reassurance, language | claude |
 | AI strategist ("Kade") | agentic frontier, mapped onto existing machinery, risks | claude |
 
+Codex low or Claude busy? Move one codex/claude persona onto `cursor` (fourth pool, ≤3 legs).
+
 Swap archetypes to fit the subject (e.g. a client persona, a bookkeeper). Keep at
 least one *user* persona (not a builder) and one *skeptic-adjacent* lens.
 
