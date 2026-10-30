@@ -50,6 +50,11 @@ Run the 15-point checklist in `references/design-principles.md`. It covers hit t
 - Separate **Keep** (genuine strengths — name them so the audit isn't just negative and so a rebuild doesn't throw them out) from **Fix**.
 - Rank by leverage: what unblocks the most jobs for the least effort.
 
+### 4b · Record the real "before" (and later the "after")
+When the app's source is in git, capture a UI timelapse with the `ui-timelapse` skill (if installed) before you write the report, and
+again after the fixes ship. The player shows the real before and after next to the mockups, and every later
+round adds to the same record.
+
 ### 5 · Build the VISUAL before/after report
 This is the deliverable. Use the `mcp__visualize` tools (`read_me` with modules `["mockup","diagram"]`, then `show_widget`). Full build spec + widget gotchas are in `references/visual-report.md`; start from the CSS/skeleton in `assets/report-template.html` so you don't rebuild the device-frame styles each time.
 

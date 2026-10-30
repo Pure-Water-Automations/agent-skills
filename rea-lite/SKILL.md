@@ -75,6 +75,9 @@ Keep ids stable (G1…, E1…) so builders, tests and commits can cite them. Com
 - Never `npm run build` in the main checkout while the dev server runs (clobbers `.next`); builders build
   in their worktrees. Don't `pkill` broad patterns — you can kill the dev server.
 
+**Timelapse:** capture a UI timelapse before round 1 and again after every merged round with the `ui-timelapse` skill (if installed),
+so each round's change is on record as real screenshots. Link the player in the report.
+
 ## 5. Retest against the reference (you)
 
 - Desktop: do the same actions you observed in step 1 on our app; compare numbers and behaviour.
@@ -90,4 +93,4 @@ health and that the live commit = HEAD. Update the repo AGENTS.md / registry ent
 
 ## Report back
 
-Lead with what now matches, then what deliberately doesn't (listed in the doc), tests, and what's live.
+Lead with what now matches, then what deliberately doesn't (listed in the doc), tests, and what's live. Include the timelapse player link when you captured one.

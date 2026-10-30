@@ -26,6 +26,11 @@ recordings-library redesign); LOCAL.md, when present, points to it. Worked
 example only — it proves the shape and calibrates depth; don't consult it for
 a new feature's content.
 
+## Phase 0 — Record the baseline (when the app's source is in git)
+
+Capture a UI timelapse with the `ui-timelapse` skill before anything changes, so the redesign
+later has a real "before" on record and every round after it adds a version.
+
 ## Phase 1 — Parallel research (cheaper-model subagents, max 3 at once)
 
 Launch up to 3 subagents in one message — Agent tool, `general-purpose`,
